@@ -13,6 +13,12 @@ async function main() {
   renderKpis(data.meta);
   renderStatusCard(data.current_status);
   renderPriceChart(data.series, data.trades);
+  renderDeviationChart(data.series);
+  renderRsiChart(data.series);
+  renderMacdChart(data.series);
+  renderEquityChart(data.series);
+  renderSellReasonChart(data.sell_reason_breakdown);
+  renderTradesTable(data.trades);
 }
 
 function showDataError(message) {
@@ -110,6 +116,141 @@ function renderPriceChart(series, trades) {
     ],
   });
   window.addEventListener('resize', () => chart.resize());
+}
+
+function renderDeviationChart(series) {
+  const chart = echarts.init(document.getElementById('chart-deviation'));
+  chart.setOption({
+    backgroundColor: 'transparent',
+    grid: baseGrid(),
+    tooltip: { trigger: 'axis' },
+    xAxis: { type: 'category', data: series.dates, ...DARK_AXIS },
+    yAxis: { type: 'value', ...DARK_AXIS },
+    dataZoom: [{ type: 'inside' }],
+    series: [{
+      type: 'bar', data: series.deviation,
+      itemStyle: { color: (p) => (p.value >= 7 ? '#f85149' : p.value >= 0 ? '#3fb950' : '#58a6ff') },
+    }],
+  });
+  window.addEventListener('resize', () => chart.resize());
+}
+
+function renderRsiChart(series) {
+  const chart = echarts.init(document.getElementById('chart-rsi'));
+  chart.setOption({
+    backgroundColor: 'transparent',
+    grid: baseGrid(),
+    tooltip: { trigger: 'axis' },
+    legend: { data: ['RSI14', 'RSI6'], textStyle: { color: '#8b949e' }, top: 0 },
+    xAxis: { type: 'category', data: series.dates, ...DARK_AXIS },
+    yAxis: { type: 'value', min: 0, max: 100, ...DARK_AXIS },
+    dataZoom: [{ type: 'inside' }],
+    series: [
+      { name: 'RSI14', type: 'line', data: series.rsi14, showSymbol: false, lineStyle: { color: '#a371f7' } },
+      { name: 'RSI6', type: 'line', data: series.rsi6, showSymbol: false, lineStyle: { color: '#d29922', opacity: 0.5 } },
+    ],
+  });
+  window.addEventListener('resize', () => chart.resize());
+}
+
+function renderMacdChart(series) {
+  const chart = echarts.init(document.getElementById('chart-macd'));
+  chart.setOption({
+    backgroundColor: 'transparent',
+    grid: baseGrid(),
+    tooltip: { trigger: 'axis' },
+    legend: { data: ['MACD', 'Signal'], textStyle: { color: '#8b949e' }, top: 0 },
+    xAxis: { type: 'category', data: series.dates, ...DARK_AXIS },
+    yAxis: { type: 'value', ...DARK_AXIS },
+    dataZoom: [{ type: 'inside' }],
+    series: [
+      { name: 'MACD柱', type: 'bar', data: series.macd_hist, itemStyle: { color: (p) => (p.value >= 0 ? '#3fb950' : '#f85149') } },
+      { name: 'MACD', type: 'line', data: series.macd, showSymbol: false, lineStyle: { color: '#58a6ff' } },
+      { name: 'Signal', type: 'line', data: series.macd_signal, showSymbol: false, lineStyle: { color: '#d29922' } },
+    ],
+  });
+  window.addEventListener('resize', () => chart.resize());
+}
+
+function renderEquityChart(series) {
+  const chart = echarts.init(document.getElementById('chart-equity'));
+  chart.setOption({
+    backgroundColor: 'transparent',
+    grid: baseGrid(),
+    tooltip: { trigger: 'axis' },
+    legend: { data: ['MA250策略', '买入持有'], textStyle: { color: '#8b949e' }, top: 0 },
+    xAxis: { type: 'category', data: series.dates, ...DARK_AXIS },
+    yAxis: { type: 'value', ...DARK_AXIS },
+    dataZoom: [{ type: 'inside' }, { type: 'slider' }],
+    series: [
+      { name: 'MA250策略', type: 'line', data: series.equity_strategy, showSymbol: false, lineStyle: { width: 2, color: '#3fb950' } },
+      { name: '买入持有', type: 'line', data: series.equity_buyhold, showSymbol: false, lineStyle: { width: 1, color: '#8b949e', type: 'dashed' } },
+    ],
+  });
+  window.addEventListener('resize', () => chart.resize());
+}
+
+function renderSellReasonChart(breakdown) {
+  const chart = echarts.init(document.getElementById('chart-sell-reason'));
+  chart.setOption({
+    backgroundColor: 'transparent',
+    grid: { left: 90, right: 40, top: 20, bottom: 30 },
+    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+    xAxis: { type: 'value', ...DARK_AXIS },
+    yAxis: { type: 'category', data: breakdown.map(b => b.reason), ...DARK_AXIS },
+    series: [{
+      type: 'bar',
+      data: breakdown.map(b => b.count),
+      itemStyle: { color: '#f85149' },
+      label: {
+        show: true, position: 'right', color: '#c9d1d9',
+        formatter: (p) => `${breakdown[p.dataIndex].count}笔 · 均${fmtSigned(breakdown[p.dataIndex].avg_pnl_pct)}`,
+      },
+    }],
+  });
+  window.addEventListener('resize', () => chart.resize());
+}
+
+let currentTrades = [];
+let sortState = { key: 'seq', dir: 1 };
+const TRADE_COLUMN_KEYS = ['seq', 'buy_date', 'sell_date', 'buy_price_raw', 'sell_price_raw', 'pnl_pct', 'hold_days', 'sell_reason'];
+
+function renderTradesTable(trades) {
+  currentTrades = trades;
+  document.querySelectorAll('#trades-table th').forEach((th, i) => {
+    th.onclick = () => {
+      const key = TRADE_COLUMN_KEYS[i];
+      sortState.dir = sortState.key === key ? -sortState.dir : 1;
+      sortState.key = key;
+      drawTradesBody();
+    };
+  });
+  drawTradesBody();
+}
+
+function drawTradesBody() {
+  const rows = [...currentTrades].sort((a, b) => {
+    const av = a[sortState.key];
+    const bv = b[sortState.key];
+    if (av === null) return 1;
+    if (bv === null) return -1;
+    if (av < bv) return -1 * sortState.dir;
+    if (av > bv) return 1 * sortState.dir;
+    return 0;
+  });
+  const tbody = document.getElementById('trades-table-body');
+  tbody.innerHTML = rows.map(t => `
+    <tr class="${t.open ? 'open-row' : ''}">
+      <td>${t.seq}</td>
+      <td>${t.buy_date}</td>
+      <td>${t.sell_date ?? '持仓中…'}</td>
+      <td>${t.buy_price_raw}</td>
+      <td>${t.sell_price_raw}</td>
+      <td>${fmtSigned(t.pnl_pct)}</td>
+      <td>${t.hold_days}</td>
+      <td>${t.sell_reason}</td>
+    </tr>
+  `).join('');
 }
 
 document.addEventListener('DOMContentLoaded', main);

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>510880 红利ETF · MA250策略仪表盘</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <span id="status-dot" class="status-dot"></span>
+    <h1>510880 红利ETF · MA250策略</h1>
+    <span id="updated-at" class="updated-at"></span>
+  </header>
+
+  <section class="kpi-row" id="kpi-row"></section>
+
+  <section class="status-card" id="status-card"></section>
+
+  <section class="panel" id="panel-main">
+    <h2>价格 &amp; MA250</h2>
+    <div class="chart" id="chart-price"></div>
+  </section>
+
+  <details class="panel collapsible">
+    <summary>偏离度</summary>
+    <div class="chart" id="chart-deviation"></div>
+  </details>
+
+  <details class="panel collapsible">
+    <summary>RSI</summary>
+    <div class="chart" id="chart-rsi"></div>
+  </details>
+
+  <details class="panel collapsible">
+    <summary>MACD</summary>
+    <div class="chart" id="chart-macd"></div>
+  </details>
+
+  <details class="panel collapsible">
+    <summary>策略 vs 买入持有</summary>
+    <div class="chart" id="chart-equity"></div>
+  </details>
+
+  <details class="panel collapsible">
+    <summary>卖出原因分布</summary>
+    <div class="chart" id="chart-sell-reason"></div>
+  </details>
+
+  <details class="panel collapsible">
+    <summary>全部交易明细</summary>
+    <table class="trades-table" id="trades-table">
+      <thead>
+        <tr>
+          <th>序号</th><th>买入日期</th><th>卖出日期</th><th>买价</th>
+          <th>卖价</th><th>收益%</th><th>持仓天</th><th>卖出原因</th>
+        </tr>
+      </thead>
+      <tbody id="trades-table-body"></tbody>
+    </table>
+  </details>
+
+  <footer class="footer">
+    <p id="data-error" class="data-error" hidden></p>
+    <p>数据来源:新浪/腾讯财经(510880/511260日线) | 每日北京时间15:40自动更新</p>
+    <p class="disclaimer">本页面为个人量化研究记录,不构成投资建议。历史回测结果不代表未来收益。</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

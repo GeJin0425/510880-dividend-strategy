@@ -1,13 +1,21 @@
 import pandas as pd
 
 
-def backtest(df, idle_price=None, initial=100000, comm=0.001):
-    """回测引擎: 持仓510880 + 空仓期买入十年国债ETF"""
+def backtest(df, idle_price=None, initial=100000, comm=0.001, min_comm=0.0):
+    """回测引擎: 持仓510880 + 空仓期买入十年国债ETF
+
+    佣金按每笔成交额计算: max(成交额 * comm, min_comm)。
+    默认保留旧的万10(0.1%)、无最低佣金口径; 线上发布请传入真实费率
+    (export.py 中为 万0.5 + 单笔最低0.5元)。
+    """
     capital = initial
     shares = 0
     shares_idle = 0
     trades = []
     equity = []
+
+    def fee(notional):
+        return max(notional * comm, min_comm)
 
     for i in range(len(df)):
         sig = df.iloc[i]['signal']
@@ -17,17 +25,17 @@ def backtest(df, idle_price=None, initial=100000, comm=0.001):
 
         if sig == 1 and shares == 0:
             if shares_idle > 0 and idle_close:
-                capital += shares_idle * idle_close * (1 - comm)
+                capital += shares_idle * idle_close - fee(shares_idle * idle_close)
                 shares_idle = 0
-            s = int((capital * (1 - comm)) / close / 100) * 100
-            capital -= s * close * (1 + comm)
+            s = int((capital - fee(capital)) / close / 100) * 100
+            capital -= s * close + fee(s * close)
             shares = s
             trades.append({
                 'date': date, 'action': 'BUY', 'price': close, 'shares': s,
                 'price_raw': df.iloc[i]['close_raw'],
             })
         elif sig == -1 and shares > 0:
-            capital += shares * close * (1 - comm)
+            capital += shares * close - fee(shares * close)
             pnl = (close / trades[-1]['price'] - 1) * 100
             trades.append({
                 'date': date, 'action': 'SELL', 'price': close, 'shares': shares,
@@ -37,9 +45,9 @@ def backtest(df, idle_price=None, initial=100000, comm=0.001):
             })
             shares = 0
             if idle_close and idle_close > 0:
-                si = int((capital * (1 - comm)) / idle_close / 100) * 100
+                si = int((capital - fee(capital)) / idle_close / 100) * 100
                 if si > 0:
-                    capital -= si * idle_close * (1 + comm)
+                    capital -= si * idle_close + fee(si * idle_close)
                     shares_idle = si
 
         total = capital + (shares * close if shares > 0 else 0)

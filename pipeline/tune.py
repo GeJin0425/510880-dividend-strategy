@@ -8,7 +8,7 @@
     python -m pipeline.tune validate --best "..."  # 样本内/外验证一组参数
 
 数据只抓一次缓存到 tuning_results/data_cache.csv, 后续扫描离线进行。
-指标口径与 export.py 完全一致 (2018-01-01 起, 含511260空仓收益, 佣金0.1%)。
+指标口径与 export.py 完全一致 (2018-01-01 起, 含511260空仓收益, 佣金万0.5+单笔最低0.5元)。
 """
 import argparse
 import copy
@@ -23,7 +23,7 @@ import numpy as np
 import pandas as pd
 
 from .backtest import backtest
-from .export import compute_holding_pct, compute_stats
+from .export import FEE_MIN, FEE_RATE, compute_holding_pct, compute_stats
 from .fetch import fetch_510880_qfq, fetch_511260_close
 from .indicators import add_indicators
 from .strategy import PARAMS, run_strategy
@@ -64,11 +64,11 @@ def load_data(refresh=False):
     return df, idle
 
 
-def evaluate(p, df, idle, start=DISPLAY_START, comm=0.001):
+def evaluate(p, df, idle, start=DISPLAY_START, comm=FEE_RATE, min_comm=FEE_MIN):
     """与线上完全一致的单参数组合评估。返回指标 dict 或 None(无可平仓交易)"""
     df_sig = run_strategy(df, p)
     try:
-        eq, tr = backtest(df_sig, idle_price=idle, comm=comm)
+        eq, tr = backtest(df_sig, idle_price=idle, comm=comm, min_comm=min_comm)
     except Exception:
         return None
     df2 = df_sig[df_sig.index >= start]
@@ -194,10 +194,10 @@ def cmd_validate(args, df, idle):
                   f'trades={r["n_trades"]}  avg={r["avg_win_pct"]:.1f}%  hold={r["holding_pct"]:.0f}%')
 
 
-def evaluate_range(params, df, idle, start, end, comm=0.001):
+def evaluate_range(params, df, idle, start, end, comm=FEE_RATE, min_comm=FEE_MIN):
     """在 [start, end] 区间内评估(交易必须在该区间内开平仓)"""
     df_sig = run_strategy(df, params)
-    eq, tr = backtest(df_sig, idle_price=idle, comm=comm)
+    eq, tr = backtest(df_sig, idle_price=idle, comm=comm, min_comm=min_comm)
     df2 = df_sig[(df_sig.index >= start) & (df_sig.index <= end)]
     eq2 = eq[(eq.index >= start) & (eq.index <= end)]
     buys = tr[(tr['action'] == 'BUY') & (tr['date'] >= start) & (tr['date'] <= end)]
@@ -262,10 +262,10 @@ def cmd_compare(args, df, idle):
 
     print('\n[2] 费用敏感度 (全样本年化%)')
     rows = []
-    for comm in [0.001, 0.002, 0.003, 0.005]:
-        rb = evaluate(base, df, idle, comm=comm)
-        rc = evaluate(cand, df, idle, comm=comm)
-        rows.append({'comm': f'{comm*100:.1f}%',
+    for comm in [0.0002, 0.0005, 0.001, 0.002, 0.003, 0.005]:
+        rb = evaluate(base, df, idle, comm=comm, min_comm=FEE_MIN)
+        rc = evaluate(cand, df, idle, comm=comm, min_comm=FEE_MIN)
+        rows.append({'comm': f'{comm*100:.2f}%',
                      f'{label_base}_ann': rb['annualized_pct'] if rb else None,
                      f'{label_cand}_ann': rc['annualized_pct'] if rc else None,
                      'diff_pp': (rc['annualized_pct'] - rb['annualized_pct']) if rb and rc else None})
@@ -274,8 +274,8 @@ def cmd_compare(args, df, idle):
     lo, hi = 0.001, 0.02
     while hi - lo > 1e-4:
         mid = (lo + hi) / 2
-        rb = evaluate(base, df, idle, comm=mid)
-        rc = evaluate(cand, df, idle, comm=mid)
+        rb = evaluate(base, df, idle, comm=mid, min_comm=FEE_MIN)
+        rc = evaluate(cand, df, idle, comm=mid, min_comm=FEE_MIN)
         if rb is None or rc is None:
             break
         if rc['annualized_pct'] >= rb['annualized_pct']:
@@ -320,7 +320,7 @@ def cmd_bootstrap(args, df, idle):
 
     def daily_rets(p):
         df_sig = run_strategy(df, p)
-        eq, _ = backtest(df_sig, idle_price=idle)
+        eq, _ = backtest(df_sig, idle_price=idle, comm=FEE_RATE, min_comm=FEE_MIN)
         eq = eq[eq.index >= DISPLAY_START]
         return eq['equity'].pct_change().dropna().values
 

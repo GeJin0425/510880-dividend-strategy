@@ -50,11 +50,11 @@ def test_fetch_510880_qfq_applies_dividends(monkeypatch):
     assert len(out) == 5
 
 
-def test_fetch_511260_close_returns_close_series(monkeypatch):
-    dates = pd.date_range('2018-01-01', periods=3, freq='D')
+def test_fetch_511260_close_returns_qfq_close_series(monkeypatch):
+    dates = pd.to_datetime(['2025-09-19', '2025-09-22', '2025-09-23', '2025-09-24'])
     fixture = pd.DataFrame({
-        'open': [2.0, 2.0, 2.0], 'close': [2.1, 2.2, 2.3],
-        'high': [2.1] * 3, 'low': [2.0] * 3, 'volume': [10] * 3,
+        'open': [135.0] * 4, 'close': [135.0, 136.0, 134.0, 134.5],
+        'high': [136.0] * 4, 'low': [133.0] * 4, 'volume': [100] * 4,
     }, index=dates)
 
     def fake_get_price(code, frequency='1d', count=10):
@@ -62,6 +62,10 @@ def test_fetch_511260_close_returns_close_series(monkeypatch):
         return fixture
 
     monkeypatch.setattr('pipeline.fetch.get_price', fake_get_price)
-    out = fetch_511260_close(count=3)
+    monkeypatch.setattr('pipeline.fetch.DIVIDENDS_511260', [('2025-09-23', 1.36)])
+    out = fetch_511260_close(count=4)
 
-    assert out.tolist() == [2.1, 2.2, 2.3]
+    # 除息日当天不复权; 除息日前按 (136-1.36)/136 = 0.99 前复权
+    assert out.loc['2025-09-23'] == 134.0
+    assert out.loc['2025-09-22'] == round(136.0 * 0.99, 3)
+    assert out.loc['2025-09-19'] == round(135.0 * 0.99, 3)

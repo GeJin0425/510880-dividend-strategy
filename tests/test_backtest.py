@@ -20,3 +20,20 @@ def test_backtest_single_round_trip_no_idle():
     assert tr.iloc[1]['action'] == 'SELL'
     assert tr.iloc[1]['pnl_pct'] == pytest.approx((12.0 / 10.0 - 1) * 100)
     assert eq['equity'].iloc[-1] > 100000
+
+
+def test_backtest_applies_min_commission():
+    dates = pd.date_range('2020-01-01', periods=3, freq='D')
+    df = pd.DataFrame({
+        'close': [10.0, 11.0, 12.0],
+        'close_raw': [10.0, 11.0, 12.0],
+        'signal': [1, 0, -1],
+        'sell_reason': ['', '', '涨够了'],
+    }, index=dates)
+
+    eq, tr = backtest(df, idle_price=None, initial=10000, comm=0.0, min_comm=1.0)
+
+    # 买入: 10000 - 1(最低佣金) 可买 900 股, 再扣1元最低佣金
+    assert tr.iloc[0]['shares'] == 900
+    # 卖出: 剩余现金999 + 900*12 - 1(最低佣金) = 11798
+    assert eq['equity'].iloc[-1] == 11798

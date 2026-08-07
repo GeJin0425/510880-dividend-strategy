@@ -55,7 +55,7 @@ function fmtSigned(value, suffix = '%') {
 
 function renderKpis(meta) {
   const cards = [
-    { value: fmtSigned(meta.annualized_pct), label: '年化(含分红+国债)', signed: true },
+    { value: fmtSigned(meta.annualized_pct), label: '年化(含分红+国债·万0.5)', signed: true },
     { value: `${meta.max_drawdown_pct}%`, label: '最大回撤', signed: true },
     { value: meta.sharpe.toFixed(2), label: '夏普比率', signed: false },
     { value: `${meta.win_rate_pct}%`, label: `胜率(${meta.trade_count}笔)`, signed: false },

@@ -14,6 +14,8 @@
 
 html, body {
   overflow-x: hidden;
+  width: 100%;
+  max-width: 100%;
 }
 
 body {
@@ -37,16 +39,16 @@ body {
 .status-dot.holding { background: var(--green); box-shadow: 0 0 6px var(--green); }
 .status-dot.idle { background: var(--text-dim); }
 
-.kpi-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-bottom: 16px; }
+.kpi-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-bottom: 16px; max-width: 100%; width: 100%; overflow: hidden; }
 @media (max-width: 800px) { .kpi-row { grid-template-columns: repeat(2, 1fr); } }
 
-.kpi-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 12px; text-align: center; }
-.kpi-card .value { font-family: var(--mono); font-size: 20px; font-weight: 700; }
-.kpi-card .label { font-size: 11px; color: var(--text-dim); margin-top: 4px; }
+.kpi-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 12px; text-align: center; min-width: 0; overflow: hidden; }
+.kpi-card .value { font-family: var(--mono); font-size: 20px; font-weight: 700; overflow-wrap: break-word; white-space: normal; width: 100%; }
+.kpi-card .label { font-size: 11px; color: var(--text-dim); margin-top: 4px; overflow-wrap: break-word; white-space: normal; width: 100%; }
 .kpi-card .value.pos { color: var(--green); }
 .kpi-card .value.neg { color: var(--red); }
 
-.status-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+.status-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 16px; max-width: 100%; width: 100%; overflow: hidden; }
 .status-card .signal { font-weight: 700; padding: 8px 12px; border-radius: 6px; display: inline-block; margin-top: 10px; }
 .signal.buy { background: var(--green); color: #06210f; }
 .signal.sell { background: var(--red); color: #2b0b09; }
@@ -55,13 +57,14 @@ body {
 
 .status-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; font-family: var(--mono); font-size: 13px; }
 @media (max-width: 800px) { .status-grid { grid-template-columns: repeat(2, 1fr); } }
+.status-grid > * { min-width: 0; }
 .status-grid .k { color: var(--text-dim); }
 
-.panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-bottom: 12px; }
-.panel h2, .panel summary { font-size: 14px; margin: 0 0 8px 0; }
+.panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-bottom: 12px; max-width: 100%; }
+.panel h2, .panel summary { font-size: 14px; margin: 0 0 8px 0; word-break: break-word; }
 .collapsible summary { cursor: pointer; padding: 4px 0; }
 
-.chart { width: 100%; height: 360px; }
+.chart { width: 100%; height: 360px; min-width: 0; }
 #chart-price { height: 480px; }
 
 .trades-table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 12px; }

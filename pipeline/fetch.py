@@ -19,6 +19,15 @@ DIVIDENDS_510880 = [
     ('2014-01-21', 0.0590),
 ]
 
+# 511260十年国债ETF历次(除息日, 每份分红金额)记录。
+# 该ETF 2017年成立, 2025年9月起才开始现金分红。
+DIVIDENDS_511260 = [
+    ('2025-09-23', 1.3600),
+    ('2025-12-26', 0.8330),
+    ('2026-03-25', 0.6711),
+    ('2026-06-25', 1.2686),
+]
+
 
 def apply_qfq(df, dividends):
     """对不复权日线做前复权调整，返回新增 close_raw/high_raw/low_raw/adjust_factor 列的DataFrame"""
@@ -52,6 +61,6 @@ def fetch_510880_qfq(count=3000):
 
 
 def fetch_511260_close(count=2500):
-    """拉取511260十年国债ETF收盘价序列（空仓期配置资产）"""
+    """拉取511260十年国债ETF前复权收盘价序列（空仓期配置资产, 含现金分红）"""
     raw = get_price('sh511260', frequency='1d', count=count)
-    return raw['close']
+    return apply_qfq(raw, DIVIDENDS_511260)['close']

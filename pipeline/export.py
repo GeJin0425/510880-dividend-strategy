@@ -13,6 +13,10 @@ from .strategy import PARAMS, run_strategy
 SELL_TIER_ORDER = ['硬上限', 'RSI确认', '偏离回落', 'RSI下穿']
 DISPLAY_START = '2018-01-01'
 
+# 真实交易费率: 佣金万0.5(0.005%), 单笔最低0.5元, ETF免印花税
+FEE_RATE = 0.00005
+FEE_MIN = 0.5
+
 
 def _safe_list(series, ndigits=None):
     s = series.round(ndigits) if ndigits is not None else series
@@ -196,7 +200,7 @@ def export(output_path, count_510880=3000, count_511260=2500):
     except Exception as e:
         print(f'511260获取失败,继续但不计空仓收益: {e}')
 
-    eq, tr = backtest(df_sig, idle_price=idle_price)
+    eq, tr = backtest(df_sig, idle_price=idle_price, comm=FEE_RATE, min_comm=FEE_MIN)
 
     df2 = df_sig[df_sig.index >= DISPLAY_START].copy()
     eq2 = eq[eq.index >= DISPLAY_START].copy()
@@ -214,6 +218,8 @@ def export(output_path, count_510880=3000, count_511260=2500):
     payload = {
         'meta': {
             **stats,
+            'fee_rate': FEE_RATE,
+            'min_fee': FEE_MIN,
             'updated_at': beijing_now.isoformat(),
             'as_of_date': df2.index[-1].strftime('%Y-%m-%d'),
         },

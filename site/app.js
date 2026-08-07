@@ -87,11 +87,11 @@ function baseGrid() {
 function renderPriceChart(series, trades) {
   const chart = echarts.init(document.getElementById('chart-price'));
   const buyPoints = trades.map(t => ({
-    coord: [t.buy_date, t.buy_price_raw], symbol: 'triangle',
+    coord: [t.buy_date, t.buy_price], symbol: 'triangle',
     itemStyle: { color: '#3fb950' },
   }));
   const sellPoints = trades.filter(t => t.sell_date).map(t => ({
-    coord: [t.sell_date, t.sell_price_raw], symbol: 'pin',
+    coord: [t.sell_date, t.sell_price], symbol: 'pin',
     itemStyle: { color: '#f85149' },
   }));
 

@@ -1,9 +1,9 @@
 import pandas as pd
 
 PARAMS = dict(
-    b1=-2.0, b2=0.0, b2r=35.0, b3lo=0.0, b3hi=4.0,
-    s1=14.0, s2=7.0, s2r=75.0, s3pk=6.0, s3dp=2.0,
-    s4pr=4.0, s4r=65.0, cooldown=10,
+    b1=-1.67, b2=1.0, b2r=31.67, b3lo=0.0, b3hi=4.0,
+    s1=14.0, s2=5.0, s2r=77.5, s3pk=6.0, s3dp=2.33,
+    s4pr=3.5, s4r=67.5, cooldown=10,
 )
 
 

@@ -5,6 +5,7 @@
 **策略摘要**：价格接近MA250时买入，远离MA250时卖出；空仓期配置511260十年国债ETF。2018年至今回测年化约+23%，最大回撤-13.9%，23笔交易全部盈利（历史数据，不代表未来收益）。
 
 - 在线仪表盘：https://gejin0425.github.io/510880-dividend-strategy/
+- 主图支持 全部 / YTD / 近1年 / 近3年 / 近5年 时间范围切换
 - 每日北京时间15:40自动抓取行情、重新计算指标并发布（GitHub Actions）
 - 详细设计文档：[docs/superpowers/specs/2026-08-06-github-pages-dashboard-design.md](docs/superpowers/specs/2026-08-06-github-pages-dashboard-design.md)
 

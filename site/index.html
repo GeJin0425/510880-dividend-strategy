@@ -50,11 +50,12 @@
 
   <details class="panel collapsible">
     <summary>全部交易明细</summary>
+    <p class="table-note">价格为不复权(与券商App显示一致);收益%按前复权价格计算,两者不会直接对上,属正常现象。</p>
     <table class="trades-table" id="trades-table">
       <thead>
         <tr>
-          <th>序号</th><th>买入日期</th><th>卖出日期</th><th>买价</th>
-          <th>卖价</th><th>收益%</th><th>持仓天</th><th>卖出原因</th>
+          <th>序号</th><th>买入日期</th><th>卖出日期</th><th>买价(不复权)</th>
+          <th>卖价(不复权)</th><th>收益%</th><th>持仓天</th><th>卖出原因</th>
         </tr>
       </thead>
       <tbody id="trades-table-body"></tbody>

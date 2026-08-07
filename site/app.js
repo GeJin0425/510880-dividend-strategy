@@ -9,6 +9,8 @@ async function main() {
     return;
   }
 
+  checkStaleness(data.meta.as_of_date);
+
   renderTopbar(data);
   renderKpis(data.meta);
   renderStatusCard(data.current_status);
@@ -25,6 +27,18 @@ function showDataError(message) {
   const el = document.getElementById('data-error');
   el.textContent = message;
   el.hidden = false;
+}
+
+const STALENESS_THRESHOLD_DAYS = 4;
+
+function checkStaleness(asOfDate) {
+  const asOf = new Date(`${asOfDate}T00:00:00`);
+  if (isNaN(asOf.getTime())) return;
+  const now = new Date();
+  const diffDays = Math.floor((now.getTime() - asOf.getTime()) / (1000 * 60 * 60 * 24));
+  if (diffDays > STALENESS_THRESHOLD_DAYS) {
+    showDataError(`数据已 ${diffDays} 天未更新,当前显示的可能不是最新信号(数据日期: ${asOfDate})`);
+  }
 }
 
 function renderTopbar(data) {

@@ -31,6 +31,9 @@ jobs:
 
       - run: python -m pipeline.export
 
+      - name: Verify generated data.json is valid
+        run: python -c "import json; json.load(open('site/data.json'))" && echo "data.json is valid JSON"
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site

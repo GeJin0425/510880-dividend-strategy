@@ -7,20 +7,21 @@ import pipeline.export as export_mod
 
 
 def _build_fixture():
-    dates = pd.date_range('2018-01-01', periods=300, freq='D')
+    # 总长度需 >= export.py 的 400 条最小史长哨兵检查（见 export() 里的截断保护）
+    dates = pd.date_range('2018-01-01', periods=410, freq='D')
     prices = np.concatenate([
         np.full(260, 100.0),               # 260天平盘，喂饱MA250热身期
         [95.0],                             # 急跌 -> 偏离度<-2% 触发L1买入
         np.linspace(96.0, 118.0, 19),        # 连续拉升
-        np.full(20, 118.0),                 # 高位横盘
+        np.full(130, 118.0),                # 高位横盘
     ])
     df = pd.DataFrame({
         'open': prices, 'close': prices, 'high': prices, 'low': prices,
-        'volume': np.full(300, 1_000_000.0),
+        'volume': np.full(410, 1_000_000.0),
         'close_raw': prices, 'high_raw': prices, 'low_raw': prices,
-        'adjust_factor': np.ones(300),
+        'adjust_factor': np.ones(410),
     }, index=dates)
-    idle = pd.Series(np.full(300, 100.0), index=dates)
+    idle = pd.Series(np.full(410, 100.0), index=dates)
     return df, idle
 
 

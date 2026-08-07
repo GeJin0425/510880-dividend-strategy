@@ -183,6 +183,10 @@ def build_series(df2, eq2, dd_series):
 
 def export(output_path, count_510880=3000, count_511260=2500):
     raw = fetch_510880_qfq(count=count_510880)
+    if len(raw) < 400:
+        raise ValueError(
+            f'510880数据只拉到{len(raw)}条,远少于预期,可能是接口返回被截断'
+        )
     df = add_indicators(raw)
     df_sig = run_strategy(df, PARAMS)
 
@@ -198,6 +202,9 @@ def export(output_path, count_510880=3000, count_511260=2500):
     eq2 = eq[eq.index >= DISPLAY_START].copy()
     buys = tr[(tr['action'] == 'BUY') & (tr['date'] >= DISPLAY_START)].reset_index(drop=True)
     sells = tr[(tr['action'] == 'SELL') & (tr['date'] >= DISPLAY_START)].reset_index(drop=True)
+
+    if len(sells) == 0:
+        raise ValueError('回测区间内没有任何已平仓交易，无法计算统计指标——检查策略参数或数据是否异常')
 
     stats, dd_series = compute_stats(df2, eq2, sells)
     stats['holding_pct'] = compute_holding_pct(buys, sells, df2)
@@ -217,7 +224,7 @@ def export(output_path, count_510880=3000, count_511260=2500):
     }
 
     with open(output_path, 'w', encoding='utf-8') as f:
-        json.dump(payload, f, ensure_ascii=False, indent=2)
+        json.dump(payload, f, ensure_ascii=False, indent=2, allow_nan=False)
     return payload
 
 

@@ -100,35 +100,71 @@ function baseGrid() {
 
 function renderPriceChart(series, trades) {
   const chart = echarts.init(document.getElementById('chart-price'));
-  const buyPoints = trades.map(t => ({
-    coord: [t.buy_date, t.buy_price], symbol: 'triangle',
-    itemStyle: { color: '#3fb950' },
-  }));
-  const sellPoints = trades.filter(t => t.sell_date).map(t => ({
-    coord: [t.sell_date, t.sell_price], symbol: 'pin',
-    itemStyle: { color: '#f85149' },
-  }));
+  const allDates = series.dates;
 
-  chart.setOption({
-    backgroundColor: 'transparent',
-    grid: baseGrid(),
-    tooltip: { trigger: 'axis', backgroundColor: '#161b22', borderColor: '#21262d', textStyle: { color: '#c9d1d9' } },
-    legend: { data: ['收盘价', 'MA10', 'MA20', 'MA60', 'MA250'], textStyle: { color: '#8b949e' }, top: 0 },
-    xAxis: { type: 'category', data: series.dates, ...DARK_AXIS },
-    yAxis: { type: 'value', scale: true, ...DARK_AXIS },
-    dataZoom: [{ type: 'inside' }, { type: 'slider', backgroundColor: '#161b22', fillerColor: 'rgba(88,166,255,0.15)' }],
-    series: [
-      { name: '收盘价', type: 'line', data: series.close, showSymbol: false, lineStyle: { width: 1.5, color: '#c9d1d9' } },
-      { name: 'MA10', type: 'line', data: series.ma10, showSymbol: false, lineStyle: { width: 1, color: '#58a6ff', opacity: 0.5 } },
-      { name: 'MA20', type: 'line', data: series.ma20, showSymbol: false, lineStyle: { width: 1, color: '#3fb950', opacity: 0.4 } },
-      { name: 'MA60', type: 'line', data: series.ma60, showSymbol: false, lineStyle: { width: 1, color: '#d29922', opacity: 0.4 } },
-      {
-        name: 'MA250', type: 'line', data: series.ma250, showSymbol: false,
-        lineStyle: { width: 2, color: '#f85149', type: 'dashed' },
-        markPoint: { symbolSize: 14, data: [...buyPoints, ...sellPoints] },
-      },
-    ],
-  });
+  function isoYearsAgo(dateStr, years) {
+    const [y, m, d] = dateStr.split('-').map(Number);
+    return new Date(Date.UTC(y - years, m - 1, d)).toISOString().slice(0, 10);
+  }
+
+  function startIndex(range) {
+    const lastDate = allDates[allDates.length - 1] ?? '';
+    if (!lastDate) return 0;
+    let startDate;
+    if (range === 'ytd') startDate = `${lastDate.slice(0, 4)}-01-01`;
+    else if (range === '1y') startDate = isoYearsAgo(lastDate, 1);
+    else if (range === '3y') startDate = isoYearsAgo(lastDate, 3);
+    else if (range === '5y') startDate = isoYearsAgo(lastDate, 5);
+    else return 0;
+    const idx = allDates.findIndex(d => d >= startDate);
+    return idx === -1 ? 0 : idx;
+  }
+
+  function buildOption(start) {
+    const dates = allDates.slice(start);
+    const firstDate = dates[0] ?? '';
+    const buyPoints = trades
+      .filter(t => t.buy_date >= firstDate)
+      .map(t => ({
+        coord: [t.buy_date, t.buy_price], symbol: 'triangle',
+        itemStyle: { color: '#3fb950' },
+      }));
+    const sellPoints = trades
+      .filter(t => t.sell_date && t.sell_date >= firstDate)
+      .map(t => ({
+        coord: [t.sell_date, t.sell_price], symbol: 'pin',
+        itemStyle: { color: '#f85149' },
+      }));
+
+    return {
+      backgroundColor: 'transparent',
+      grid: baseGrid(),
+      tooltip: { trigger: 'axis', backgroundColor: '#161b22', borderColor: '#21262d', textStyle: { color: '#c9d1d9' } },
+      legend: { data: ['收盘价', 'MA10', 'MA20', 'MA60', 'MA250'], textStyle: { color: '#8b949e' }, top: 0 },
+      xAxis: { type: 'category', data: dates, ...DARK_AXIS },
+      yAxis: { type: 'value', scale: true, ...DARK_AXIS },
+      dataZoom: [{ type: 'inside' }, { type: 'slider', backgroundColor: '#161b22', fillerColor: 'rgba(88,166,255,0.15)' }],
+      series: [
+        { name: '收盘价', type: 'line', data: series.close.slice(start), showSymbol: false, lineStyle: { width: 1.5, color: '#c9d1d9' } },
+        { name: 'MA10', type: 'line', data: series.ma10.slice(start), showSymbol: false, lineStyle: { width: 1, color: '#58a6ff', opacity: 0.5 } },
+        { name: 'MA20', type: 'line', data: series.ma20.slice(start), showSymbol: false, lineStyle: { width: 1, color: '#3fb950', opacity: 0.4 } },
+        { name: 'MA60', type: 'line', data: series.ma60.slice(start), showSymbol: false, lineStyle: { width: 1, color: '#d29922', opacity: 0.4 } },
+        {
+          name: 'MA250', type: 'line', data: series.ma250.slice(start), showSymbol: false,
+          lineStyle: { width: 2, color: '#f85149', type: 'dashed' },
+          markPoint: { symbolSize: 14, data: [...buyPoints, ...sellPoints] },
+        },
+      ],
+    };
+  }
+
+  const buttons = document.querySelectorAll('#chart-price-ranges .range-btn');
+  function applyRange(range) {
+    chart.setOption(buildOption(startIndex(range)), { notMerge: true });
+    buttons.forEach(btn => btn.classList.toggle('active', btn.dataset.range === range));
+  }
+  buttons.forEach(btn => btn.addEventListener('click', () => applyRange(btn.dataset.range)));
+  applyRange('all');
   window.addEventListener('resize', () => chart.resize());
 }
 

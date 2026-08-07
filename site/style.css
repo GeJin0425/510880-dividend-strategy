@@ -64,6 +64,20 @@ body {
 .panel h2, .panel summary { font-size: 14px; margin: 0 0 8px 0; word-break: break-word; }
 .collapsible summary { cursor: pointer; padding: 4px 0; }
 
+.chart-toolbar { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 10px 0; }
+.range-btn {
+  background: var(--bg-card);
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.range-btn:hover { color: var(--text); border-color: var(--blue); }
+.range-btn.active { color: #06210f; background: var(--green); border-color: var(--green); font-weight: 700; }
+
 .chart { width: 100%; height: 360px; min-width: 0; }
 #chart-price { height: 480px; }
 

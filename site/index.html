@@ -30,6 +30,26 @@
     <div class="chart" id="chart-price"></div>
   </section>
 
+  <section class="panel" id="panel-returns">
+    <h2>区间收益</h2>
+    <div class="chart-toolbar" id="returns-ranges">
+      <button class="range-btn active" data-range="all">全部</button>
+      <button class="range-btn" data-range="ytd">YTD</button>
+      <button class="range-btn" data-range="1y">近1年</button>
+      <button class="range-btn" data-range="3y">近3年</button>
+      <button class="range-btn" data-range="5y">近5年</button>
+    </div>
+    <table class="returns-table" id="returns-table">
+      <thead>
+        <tr>
+          <th>指标</th>
+          <th>数值</th>
+        </tr>
+      </thead>
+      <tbody id="returns-table-body"></tbody>
+    </table>
+  </section>
+
   <details class="panel collapsible">
     <summary>偏离度</summary>
     <div class="chart" id="chart-deviation"></div>

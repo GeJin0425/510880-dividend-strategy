@@ -83,6 +83,13 @@ body {
 
 .table-note { color: var(--text-dim); font-size: 12px; margin: 0 0 8px 0; }
 
+.returns-table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 13px; }
+.returns-table th, .returns-table td { border-bottom: 1px solid var(--border); padding: 7px 10px; text-align: right; }
+.returns-table th:first-child, .returns-table td:first-child { text-align: left; }
+.returns-table th { color: var(--text-dim); }
+.returns-table td.pos { color: var(--green); font-weight: 700; }
+.returns-table td.neg { color: var(--red); font-weight: 700; }
+
 .trades-table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 12px; }
 .trades-table th, .trades-table td { border-bottom: 1px solid var(--border); padding: 6px 8px; text-align: right; }
 .trades-table th:first-child, .trades-table td:first-child { text-align: left; }

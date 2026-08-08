@@ -15,7 +15,7 @@ async function main() {
   renderKpis(data.meta);
   renderStatusCard(data.current_status);
   renderPriceChart(data.series, data.trades);
-  renderReturnsTable(data.series, data.trades);
+  renderReturnsPanel(data.series, data.trades);
   renderDeviationChart(data.series);
   renderRsiChart(data.series);
   renderMacdChart(data.series);
@@ -173,8 +173,45 @@ function toneOf(value) {
   return value > 0 ? 'pos' : value < 0 ? 'neg' : '';
 }
 
-function renderReturnsTable(series, trades) {
+function renderReturnsPanel(series, trades) {
+  const chart = echarts.init(document.getElementById('chart-returns'));
   const tableBody = document.getElementById('returns-table-body');
+  const allDates = series.dates;
+
+  function buildChartOption(start) {
+    const dates = allDates.slice(start);
+    const eq = series.equity_strategy.slice(start);
+    const bh = series.equity_buyhold.slice(start);
+    const eq0 = eq[0];
+    const bh0 = bh[0];
+    const toReturn = (arr, base) => arr.map(v => (v === null || v === undefined ? null : (v / base - 1) * 100));
+
+    return {
+      backgroundColor: 'transparent',
+      grid: baseGrid(),
+      tooltip: {
+        trigger: 'axis',
+        backgroundColor: '#161b22',
+        borderColor: '#21262d',
+        textStyle: { color: '#c9d1d9' },
+        valueFormatter: (value) => (value === null || value === undefined ? '—' : `${Number(value).toFixed(1)}%`),
+      },
+      legend: { data: ['MA250策略', '无脑持有510880'], textStyle: { color: '#8b949e' }, top: 0 },
+      xAxis: { type: 'category', data: dates, ...DARK_AXIS },
+      yAxis: { type: 'value', scale: true, ...DARK_AXIS, axisLabel: { color: '#8b949e', formatter: '{value}%' } },
+      series: [
+        {
+          name: 'MA250策略', type: 'line', data: toReturn(eq, eq0), showSymbol: false,
+          lineStyle: { width: 2, color: '#3fb950' },
+          areaStyle: { color: 'rgba(63,185,80,0.08)' },
+        },
+        {
+          name: '无脑持有510880', type: 'line', data: toReturn(bh, bh0), showSymbol: false,
+          lineStyle: { width: 1.5, color: '#8b949e', type: 'dashed' },
+        },
+      ],
+    };
+  }
 
   function periodRows(start) {
     const dates = series.dates;
@@ -221,7 +258,8 @@ function renderReturnsTable(series, trades) {
   }
 
   function applyRange(range) {
-    const start = startIndexForRange(series.dates, range);
+    const start = startIndexForRange(allDates, range);
+    chart.setOption(buildChartOption(start), { notMerge: true });
     tableBody.innerHTML = periodRows(start).map(row => `
       <tr>
         <td>${row.label}</td>
@@ -237,6 +275,7 @@ function renderReturnsTable(series, trades) {
     btn.addEventListener('click', () => applyRange(btn.dataset.range))
   );
   applyRange('all');
+  window.addEventListener('resize', () => chart.resize());
 }
 
 function renderDeviationChart(series) {

@@ -1,97 +1,156 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="上证红利ETF(510880)MA250均值回归策略仪表盘:价格与MA250、区间收益、回撤、交易明细,每日自动更新。历史回测不代表未来收益。">
+<meta name="theme-color" content="#0B1220">
+<meta property="og:title" content="510880 红利ETF · MA250策略仪表盘">
+<meta property="og:description" content="MA250均值回归策略回测与每日信号,2018年至今回测年化约23%。历史数据不代表未来收益。">
+<meta property="og:type" content="website">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
 <title>510880 红利ETF · MA250策略仪表盘</title>
+<script>
+(function () {
+  try {
+    var choice = localStorage.getItem('510880-theme') || 'auto';
+    var light = choice === 'light' || (choice === 'auto' && window.matchMedia('(prefers-color-scheme: light)').matches);
+    document.documentElement.dataset.theme = light ? 'light' : 'dark';
+    document.documentElement.dataset.themeChoice = choice;
+  } catch (_) {
+    document.documentElement.dataset.theme = 'dark';
+  }
+})();
+</script>
 <link rel="stylesheet" href="style.css">
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
 </head>
 <body>
+  <a class="skip-link" href="#main">跳到主要内容</a>
+
   <header class="topbar">
-    <span id="status-dot" class="status-dot"></span>
-    <h1>510880 红利ETF · MA250策略</h1>
-    <span id="updated-at" class="updated-at"></span>
+    <div class="brand">
+      <span id="status-dot" class="status-dot idle" role="img" aria-label="策略状态:加载中"></span>
+      <h1>510880 红利ETF · MA250策略</h1>
+    </div>
+    <div class="topbar-side">
+      <span id="updated-at" class="updated-at">数据加载中…</span>
+      <div class="theme-switch" role="group" aria-label="主题切换">
+        <button type="button" class="theme-btn active" data-theme-choice="auto" aria-pressed="true">自动</button>
+        <button type="button" class="theme-btn" data-theme-choice="light" aria-pressed="false">浅色</button>
+        <button type="button" class="theme-btn" data-theme-choice="dark" aria-pressed="false">深色</button>
+      </div>
+    </div>
   </header>
 
-  <section class="kpi-row" id="kpi-row"></section>
+  <main id="main">
+    <div id="banner" class="banner" hidden></div>
 
-  <section class="status-card" id="status-card"></section>
+    <section class="kpi-row" id="kpi-row" aria-label="关键指标"></section>
 
-  <section class="panel" id="panel-main">
-    <h2>价格 &amp; MA250</h2>
-    <div class="chart-toolbar" id="chart-price-ranges">
-      <button class="range-btn active" data-range="all">全部</button>
-      <button class="range-btn" data-range="ytd">YTD</button>
-      <button class="range-btn" data-range="1y">近1年</button>
-      <button class="range-btn" data-range="3y">近3年</button>
-      <button class="range-btn" data-range="5y">近5年</button>
-    </div>
-    <div class="chart" id="chart-price"></div>
-  </section>
+    <section class="status-card" id="status-card" aria-label="当前策略状态"></section>
 
-  <section class="panel" id="panel-returns">
-    <h2>区间收益</h2>
-    <div class="chart-toolbar" id="returns-ranges">
-      <button class="range-btn active" data-range="all">全部</button>
-      <button class="range-btn" data-range="ytd">YTD</button>
-      <button class="range-btn" data-range="1y">近1年</button>
-      <button class="range-btn" data-range="3y">近3年</button>
-      <button class="range-btn" data-range="5y">近5年</button>
-    </div>
-    <div class="chart" id="chart-returns"></div>
-    <table class="returns-table" id="returns-table">
-      <thead>
-        <tr>
-          <th>指标</th>
-          <th>数值</th>
-        </tr>
-      </thead>
-      <tbody id="returns-table-body"></tbody>
-    </table>
-  </section>
+    <section class="panel" id="panel-main">
+      <div class="panel-head">
+        <h2>价格 &amp; MA250</h2>
+        <div class="chart-toolbar" id="chart-price-ranges" role="group" aria-label="价格图时间范围">
+          <button type="button" class="range-btn active" data-range="all" aria-pressed="true">全部</button>
+          <button type="button" class="range-btn" data-range="ytd" aria-pressed="false">YTD</button>
+          <button type="button" class="range-btn" data-range="1y" aria-pressed="false">近1年</button>
+          <button type="button" class="range-btn" data-range="3y" aria-pressed="false">近3年</button>
+          <button type="button" class="range-btn" data-range="5y" aria-pressed="false">近5年</button>
+        </div>
+      </div>
+      <div class="chart" id="chart-price"></div>
+      <p class="sr-only" id="chart-price-summary"></p>
+    </section>
 
-  <details class="panel collapsible">
-    <summary>偏离度</summary>
-    <div class="chart" id="chart-deviation"></div>
-  </details>
+    <section class="panel" id="panel-returns">
+      <div class="panel-head">
+        <h2>区间收益</h2>
+        <div class="chart-toolbar" id="returns-ranges" role="group" aria-label="收益图时间范围">
+          <button type="button" class="range-btn active" data-range="all" aria-pressed="true">全部</button>
+          <button type="button" class="range-btn" data-range="ytd" aria-pressed="false">YTD</button>
+          <button type="button" class="range-btn" data-range="1y" aria-pressed="false">近1年</button>
+          <button type="button" class="range-btn" data-range="3y" aria-pressed="false">近3年</button>
+          <button type="button" class="range-btn" data-range="5y" aria-pressed="false">近5年</button>
+        </div>
+      </div>
+      <div class="chart" id="chart-returns"></div>
+      <p class="sr-only" id="chart-returns-summary"></p>
+      <table class="returns-table" id="returns-table">
+        <caption class="sr-only">当前所选时间区间的策略统计</caption>
+        <thead>
+          <tr>
+            <th scope="col">指标</th>
+            <th scope="col">数值</th>
+          </tr>
+        </thead>
+        <tbody id="returns-table-body"></tbody>
+      </table>
+    </section>
 
-  <details class="panel collapsible">
-    <summary>RSI</summary>
-    <div class="chart" id="chart-rsi"></div>
-  </details>
+    <details class="panel collapsible">
+      <summary>偏离度</summary>
+      <div class="chart" id="chart-deviation"></div>
+      <p class="sr-only" id="chart-deviation-summary"></p>
+    </details>
 
-  <details class="panel collapsible">
-    <summary>MACD</summary>
-    <div class="chart" id="chart-macd"></div>
-  </details>
+    <details class="panel collapsible">
+      <summary>RSI</summary>
+      <div class="chart" id="chart-rsi"></div>
+      <p class="sr-only" id="chart-rsi-summary"></p>
+    </details>
 
-  <details class="panel collapsible">
-    <summary>策略 vs 买入持有</summary>
-    <div class="chart" id="chart-equity"></div>
-  </details>
+    <details class="panel collapsible">
+      <summary>MACD</summary>
+      <div class="chart" id="chart-macd"></div>
+      <p class="sr-only" id="chart-macd-summary"></p>
+    </details>
 
-  <details class="panel collapsible">
-    <summary>卖出原因分布</summary>
-    <div class="chart" id="chart-sell-reason"></div>
-  </details>
+    <details class="panel collapsible">
+      <summary>策略 vs 买入持有</summary>
+      <div class="chart" id="chart-equity"></div>
+      <p class="sr-only" id="chart-equity-summary"></p>
+    </details>
 
-  <details class="panel collapsible">
-    <summary>全部交易明细</summary>
-    <p class="table-note">价格为不复权(与券商App显示一致);收益%按前复权价格计算,两者不会直接对上,属正常现象。</p>
-    <table class="trades-table" id="trades-table">
-      <thead>
-        <tr>
-          <th>序号</th><th>买入日期</th><th>卖出日期</th><th>买价(不复权)</th>
-          <th>卖价(不复权)</th><th>收益%</th><th>持仓天</th><th>卖出原因</th>
-        </tr>
-      </thead>
-      <tbody id="trades-table-body"></tbody>
-    </table>
-  </details>
+    <details class="panel collapsible">
+      <summary>回撤</summary>
+      <div class="chart" id="chart-drawdown"></div>
+      <p class="sr-only" id="chart-drawdown-summary"></p>
+    </details>
+
+    <details class="panel collapsible">
+      <summary>卖出原因分布</summary>
+      <div class="chart" id="chart-sell-reason"></div>
+      <p class="sr-only" id="chart-sell-reason-summary"></p>
+    </details>
+
+    <details class="panel collapsible">
+      <summary>全部交易明细</summary>
+      <p class="table-note">价格为不复权(与券商App显示一致);收益%按前复权价格计算,两者不会直接对上,属正常现象。</p>
+      <div class="table-wrap">
+        <table class="trades-table" id="trades-table">
+          <caption class="sr-only">全部交易明细,点击表头可排序</caption>
+          <thead>
+            <tr>
+              <th scope="col" aria-sort="none">序号</th>
+              <th scope="col" aria-sort="none">买入日期</th>
+              <th scope="col" aria-sort="none">卖出日期</th>
+              <th scope="col" aria-sort="none">买价(不复权)</th>
+              <th scope="col" aria-sort="none">卖价(不复权)</th>
+              <th scope="col" aria-sort="none">收益%</th>
+              <th scope="col" aria-sort="none">持仓天</th>
+              <th scope="col" aria-sort="none">卖出原因</th>
+            </tr>
+          </thead>
+          <tbody id="trades-table-body"></tbody>
+        </table>
+      </div>
+    </details>
+  </main>
 
   <footer class="footer">
-    <p id="data-error" class="data-error" hidden></p>
     <p>数据来源:新浪/腾讯财经(510880/511260日线) | 每日北京时间15:40自动更新</p>
     <p class="disclaimer">本页面为个人量化研究记录,不构成投资建议。历史回测结果不代表未来收益。</p>
   </footer>

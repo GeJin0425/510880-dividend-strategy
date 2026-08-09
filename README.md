@@ -6,6 +6,8 @@
 
 - 在线仪表盘：https://gejin0425.github.io/510880-dividend-strategy/
 - 主图支持 全部 / YTD / 近1年 / 近3年 / 近5年 时间范围切换
+- 支持 自动 / 浅色 / 深色 主题切换（默认跟随系统）
+- 新增回撤面板、MA250斜率、加载骨架屏与数据过期提示
 - 每日北京时间15:40自动抓取行情、重新计算指标并发布（GitHub Actions）
 - 详细设计文档：[docs/superpowers/specs/2026-08-06-github-pages-dashboard-design.md](docs/superpowers/specs/2026-08-06-github-pages-dashboard-design.md)
 

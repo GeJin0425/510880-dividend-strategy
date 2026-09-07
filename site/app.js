@@ -341,7 +341,10 @@ function renderPriceChart(data) {
     const dates = allDates.slice(start);
     const firstDate = dates[0] ?? '';
 
-    const buyPoints = trades
+    const markerTrades = data.signals ? data.signals.map((s) => s.action === 'BUY'
+      ? { buy_signal_date: s.date, buy_signal_close_price: s.close }
+      : { sell_signal_date: s.date, sell_signal_close_price: s.close }) : trades;
+    const buyPoints = markerTrades
       .filter((t) => t.buy_signal_date >= firstDate)
       .map((t) => ({
         // 图上标记表示收盘时可见的信号；成交与收益仍以次日开盘价计算。
@@ -353,7 +356,7 @@ function renderPriceChart(data) {
         itemStyle: { color: p.up },
         label: { show: true, formatter: '买', position: 'top', color: p.up, fontSize: 10, fontWeight: 600, backgroundColor: p.tooltipBg, borderColor: p.up, borderWidth: 1, padding: [1, 4], borderRadius: 4 },
       }));
-    const sellPoints = trades
+    const sellPoints = markerTrades
       .filter((t) => t.sell_signal_date && t.sell_signal_date >= firstDate)
       .map((t) => ({
         name: '收盘卖出信号（次日开盘成交）',

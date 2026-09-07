@@ -150,8 +150,8 @@ def main():
     rows = []
     windows = {
         'full': DISPLAY_START,
-        # Candidates are deliberately not re-tuned on this holdout period.
-        'holdout_2024_plus': pd.Timestamp('2024-01-01'),
+        # Previously inspected history is a segment, not untouched holdout data.
+        'historical_2024_plus': pd.Timestamp('2024-01-01'),
     }
     for window, start in windows.items():
         for name, rule in candidate_rules().items():

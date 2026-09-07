@@ -2,6 +2,7 @@ import json
 
 import numpy as np
 import pandas as pd
+import pytest
 
 import pipeline.export as export_mod
 
@@ -97,3 +98,24 @@ def test_build_sell_reason_breakdown_groups_by_tier():
     assert by_reason['RSI确认']['count'] == 2
     assert by_reason['RSI确认']['avg_pnl_pct'] == 5.0
     assert by_reason['硬上限']['count'] == 1
+
+
+def test_export_open_position_and_signal_use_real_account(tmp_path, monkeypatch):
+    data, idle, scale = _build_fixture()
+    for column in ['open', 'close', 'open_raw', 'close_raw', 'high', 'low']:
+        data.loc[data.index[-3:], column] = 90.
+    monkeypatch.setattr(export_mod, 'fetch_510880_qfq', lambda **kwargs: data)
+    monkeypatch.setattr(export_mod, 'fetch_511260_qfq', lambda **kwargs: idle)
+    monkeypatch.setattr(export_mod, 'fetch_sse_scale_history', lambda *args: scale)
+    payload = export_mod.export(tmp_path / 'open.json')
+    assert payload['current_status']['holding']
+    assert payload['trades'][-1]['open']
+    assert payload['trades'][-1]['sell_close_price_raw'] == 90
+
+
+def test_export_fails_on_missing_scale_instead_of_dropping_session(tmp_path, monkeypatch):
+    data, _, scale = _build_fixture()
+    monkeypatch.setattr(export_mod, 'fetch_510880_qfq', lambda **kwargs: data)
+    monkeypatch.setattr(export_mod, 'fetch_sse_scale_history', lambda *args: scale.iloc[:-1])
+    with pytest.raises(ValueError, match='份额规模数据缺失'):
+        export_mod.export(tmp_path / 'missing.json')

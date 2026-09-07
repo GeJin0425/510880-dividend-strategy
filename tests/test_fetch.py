@@ -45,7 +45,7 @@ def test_fetch_510880_qfq_applies_dividends(monkeypatch):
 
     assert list(out.columns) == [
         'open', 'close', 'high', 'low', 'volume',
-        'close_raw', 'high_raw', 'low_raw', 'adjust_factor',
+        'open_raw', 'close_raw', 'high_raw', 'low_raw', 'adjust_factor',
     ]
     assert len(out) == 5
 

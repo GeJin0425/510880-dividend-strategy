@@ -12,7 +12,7 @@ const state = {
 const charts = [];
 let currentTrades = [];
 let sortState = { key: 'seq', dir: 1 };
-const TRADE_COLUMN_KEYS = ['seq', 'buy_level', 'buy_date', 'sell_date', 'buy_price_raw', 'sell_price_raw', 'pnl_pct', 'hold_days', 'sell_reason'];
+const TRADE_COLUMN_KEYS = ['seq', 'buy_level', 'buy_signal_date', 'buy_date', 'sell_signal_date', 'sell_date', 'buy_price_raw', 'sell_price_raw', 'pnl_pct', 'hold_days', 'sell_reason'];
 
 async function main() {
   initTheme();
@@ -753,7 +753,9 @@ function drawTradesBody() {
     <tr class="${t.open ? 'open-row' : ''}">
       <td>${t.seq}</td>
       <td>${t.buy_level || '—'}</td>
+      <td>${t.buy_signal_date}</td>
       <td>${t.buy_date}</td>
+      <td>${t.sell_signal_date ?? '—'}</td>
       <td>${t.sell_date ?? '持仓中…'}</td>
       <td>${t.buy_price_raw}</td>
       <td>${t.sell_price_raw}</td>

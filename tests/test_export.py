@@ -18,10 +18,13 @@ def _build_fixture():
     df = pd.DataFrame({
         'open': prices, 'close': prices, 'high': prices, 'low': prices,
         'volume': np.full(410, 1_000_000.0),
-        'close_raw': prices, 'high_raw': prices, 'low_raw': prices,
+        'open_raw': prices, 'close_raw': prices, 'high_raw': prices, 'low_raw': prices,
         'adjust_factor': np.ones(410),
     }, index=dates)
-    idle = pd.Series(np.full(410, 100.0), index=dates)
+    idle = pd.DataFrame({
+        'open': np.full(410, 100.0), 'close': np.full(410, 100.0),
+        'open_raw': np.full(410, 100.0), 'close_raw': np.full(410, 100.0),
+    }, index=dates)
     shares = np.exp(np.arange(410) * 0.0005 + np.sin(np.arange(410) / 11) * 0.01)
     scale = pd.DataFrame({'scale_yi': shares * prices}, index=dates)
     return df, idle, scale
@@ -30,7 +33,7 @@ def _build_fixture():
 def test_export_end_to_end(tmp_path, monkeypatch):
     fixture_df, fixture_idle, fixture_scale = _build_fixture()
     monkeypatch.setattr(export_mod, 'fetch_510880_qfq', lambda count=3000: fixture_df)
-    monkeypatch.setattr(export_mod, 'fetch_511260_close', lambda count=2500: fixture_idle)
+    monkeypatch.setattr(export_mod, 'fetch_511260_qfq', lambda count=2500: fixture_idle)
     monkeypatch.setattr(export_mod, 'fetch_sse_scale_history', lambda fund_code='510880': fixture_scale)
     # 跳过前250+天MA250热身期，避免展示窗口内出现NaN
     monkeypatch.setattr(export_mod, 'DISPLAY_START', fixture_df.index[255].strftime('%Y-%m-%d'))
@@ -63,8 +66,8 @@ def test_build_current_status_sell_signal_triggered():
     status = export_mod.build_current_status(df2, latest_position=1)
     assert status['holding'] is True
     assert status['signal_level'] == 'sell'
-    assert '卖出信号触发' in status['signal_text']
-    assert '下一交易日执行' in status['signal_text']
+    assert '卖出收盘信号触发' in status['signal_text']
+    assert '下一交易日开盘执行' in status['signal_text']
 
 
 def test_build_current_status_idle_buy_triggered():
@@ -78,7 +81,7 @@ def test_build_current_status_idle_buy_triggered():
     status = export_mod.build_current_status(df2, latest_position=0)
     assert status['holding'] is False
     assert status['signal_level'] == 'buy'
-    assert status['signal_text'] == 'b1信号触发 | 下一交易日执行'
+    assert status['signal_text'] == 'b1收盘信号触发 | 将于下一交易日开盘执行'
 
 
 def test_build_sell_reason_breakdown_groups_by_tier():

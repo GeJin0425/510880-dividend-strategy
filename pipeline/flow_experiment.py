@@ -13,7 +13,7 @@ import numpy as np
 import pandas as pd
 
 from .backtest import backtest
-from .export import FEE_MIN, FEE_RATE, compute_stats
+from .export import EXECUTION_MODE, FEE_MIN, FEE_RATE, compute_stats
 from .fetch import DIVIDENDS_510880, DIVIDENDS_511260, apply_qfq
 from .indicators import add_indicators
 from .share_flow import add_share_flow_indicators, derive_shares_from_scale
@@ -59,23 +59,25 @@ def load_research_data(scale_path, price_path, idle_path):
     data["shares"] = derive_shares_from_scale(data["scale_yi"], data["close_raw"])
     data = add_share_flow_indicators(data)
     data["momentum_252"] = data["close"] / data["close"].shift(252) - 1
-    idle = _load_price(idle_path, DIVIDENDS_511260)["close"]
+    idle = _load_price(idle_path, DIVIDENDS_511260)
     return data.sort_index(), idle.sort_index()
 
 
-def evaluate(data, idle, flow_rule, start, end=None, signal_lag=1):
+def evaluate(data, idle, flow_rule, start, end=None, execution_mode=EXECUTION_MODE):
     research = data[data.index >= start]
     if end:
         research = research[research.index <= end]
     # Reset strategy and portfolio state at each window boundary. Indicators
     # were calculated on the full warm-up history before this slice.
-    signaled = run_strategy(research, PARAMS, flow_rule=flow_rule)
+    signaled = run_strategy(
+        research, PARAMS, flow_rule=flow_rule, execution_mode=execution_mode,
+    )
     equity, trades = backtest(
         signaled,
         idle_price=idle,
         comm=FEE_RATE,
         min_comm=FEE_MIN,
-        signal_lag=signal_lag,
+        execution_mode=execution_mode,
     )
     d = signaled
     eq = equity.reindex(d.index).dropna()
@@ -112,12 +114,12 @@ def run_matrix(data, idle):
     rows = []
     for variant, rule in VARIANTS.items():
         for window, start, end in windows:
-            result = evaluate(data, idle, rule, start, end, signal_lag=1)
+            result = evaluate(data, idle, rule, start, end)
             if result:
                 rows.append({"variant": variant, "window": window, **result})
 
-    # Quantify how much the legacy same-close convention changes the baseline.
-    same_close = evaluate(data, idle, None, common_start, signal_lag=0)
+    # 保留旧口径仅作差异参考，不能作为实盘执行绩效。
+    same_close = evaluate(data, idle, None, common_start, execution_mode='same_close')
     if same_close:
         rows.append({"variant": "base_same_close_reference", "window": "full", **same_close})
     return pd.DataFrame(rows), common_start

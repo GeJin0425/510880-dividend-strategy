@@ -23,8 +23,8 @@ import numpy as np
 import pandas as pd
 
 from .backtest import backtest
-from .export import FEE_MIN, FEE_RATE, compute_holding_pct, compute_stats
-from .fetch import fetch_510880_qfq, fetch_511260_close
+from .export import EXECUTION_MODE, FEE_MIN, FEE_RATE, compute_holding_pct, compute_stats
+from .fetch import fetch_510880_qfq, fetch_511260_qfq
 from .indicators import add_indicators
 from .strategy import PARAMS, run_strategy
 
@@ -44,7 +44,12 @@ BASE_PARAMS = dict(
 def load_data(refresh=False):
     if not refresh and os.path.exists(CACHE) and os.path.exists(IDLE_CACHE):
         df = pd.read_csv(CACHE, parse_dates=['date']).set_index('date')
-        idle = pd.read_csv(IDLE_CACHE, parse_dates=['date']).set_index('date')['close']
+        idle = pd.read_csv(IDLE_CACHE, parse_dates=['date']).set_index('date')
+        if EXECUTION_MODE == 'next_open' and (
+            'open' not in df.columns or 'open' not in idle.columns
+        ):
+            print('[load] 旧缓存缺少开盘价，重新抓取')
+            return load_data(refresh=True)
         print(f'[load] 从缓存读取 {len(df)} 行 ({df.index[0].date()} -> {df.index[-1].date()})')
         return df, idle
 
@@ -52,11 +57,7 @@ def load_data(refresh=False):
     raw = fetch_510880_qfq(count=3000)
     raw.index.name = 'date'
     df = add_indicators(raw)
-    try:
-        idle = fetch_511260_close(count=2500)
-    except Exception as e:
-        print(f'[warn] 511260 抓取失败: {e}')
-        idle = pd.Series(dtype=float)
+    idle = fetch_511260_qfq(count=2500)
     idle.index.name = 'date'
     df.reset_index().to_csv(CACHE, index=False)
     idle.reset_index().to_csv(IDLE_CACHE, index=False)
@@ -66,9 +67,12 @@ def load_data(refresh=False):
 
 def evaluate(p, df, idle, start=DISPLAY_START, comm=FEE_RATE, min_comm=FEE_MIN):
     """与线上完全一致的单参数组合评估。返回指标 dict 或 None(无可平仓交易)"""
-    df_sig = run_strategy(df, p)
+    df_sig = run_strategy(df, p, execution_mode=EXECUTION_MODE)
     try:
-        eq, tr = backtest(df_sig, idle_price=idle, comm=comm, min_comm=min_comm)
+        eq, tr = backtest(
+            df_sig, idle_price=idle, comm=comm, min_comm=min_comm,
+            execution_mode=EXECUTION_MODE,
+        )
     except Exception:
         return None
     df2 = df_sig[df_sig.index >= start]
@@ -196,8 +200,11 @@ def cmd_validate(args, df, idle):
 
 def evaluate_range(params, df, idle, start, end, comm=FEE_RATE, min_comm=FEE_MIN):
     """在 [start, end] 区间内评估(交易必须在该区间内开平仓)"""
-    df_sig = run_strategy(df, params)
-    eq, tr = backtest(df_sig, idle_price=idle, comm=comm, min_comm=min_comm)
+    df_sig = run_strategy(df, params, execution_mode=EXECUTION_MODE)
+    eq, tr = backtest(
+        df_sig, idle_price=idle, comm=comm, min_comm=min_comm,
+        execution_mode=EXECUTION_MODE,
+    )
     df2 = df_sig[(df_sig.index >= start) & (df_sig.index <= end)]
     eq2 = eq[(eq.index >= start) & (eq.index <= end)]
     buys = tr[(tr['action'] == 'BUY') & (tr['date'] >= start) & (tr['date'] <= end)]
@@ -319,8 +326,11 @@ def cmd_bootstrap(args, df, idle):
     rng = np.random.default_rng(args.seed)
 
     def daily_rets(p):
-        df_sig = run_strategy(df, p)
-        eq, _ = backtest(df_sig, idle_price=idle, comm=FEE_RATE, min_comm=FEE_MIN)
+        df_sig = run_strategy(df, p, execution_mode=EXECUTION_MODE)
+        eq, _ = backtest(
+            df_sig, idle_price=idle, comm=FEE_RATE, min_comm=FEE_MIN,
+            execution_mode=EXECUTION_MODE,
+        )
         eq = eq[eq.index >= DISPLAY_START]
         return eq['equity'].pct_change().dropna().values
 

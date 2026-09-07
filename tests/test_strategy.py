@@ -37,3 +37,17 @@ def test_flow_rule_can_veto_but_not_create_an_entry():
 
     assert out['signal'].iloc[3] == 0
     assert out['signal'].iloc[4] == 1
+
+
+def test_next_open_s4pr_uses_actual_open_entry_price():
+    rows = [_row(100, 100, 50) for _ in range(3)]
+    rows.append({**_row(97, 100, 80), 'open': 97})  # T 日收盘买入信号
+    rows.append({**_row(95, 100, 60), 'open': 90})  # T+1 跳空低开成交，收盘盈利并RSI下穿
+    df = pd.DataFrame(rows)
+    df['open'] = df['open'].fillna(df['close'])
+
+    out = run_strategy(df, p=PARAMS, execution_mode='next_open')
+
+    assert out['signal'].iloc[3] == 1
+    assert out['signal'].iloc[4] == -1
+    assert 'RSI下穿' in out['sell_reason'].iloc[4]

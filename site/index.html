@@ -134,7 +134,7 @@
 
     <details class="panel collapsible">
       <summary>全部交易明细</summary>
-      <p class="table-note">价格为不复权(与券商App显示一致);收益%按前复权价格计算,两者不会直接对上,属正常现象。</p>
+      <p class="table-note">信号于收盘形成、下一交易日开盘成交。表内价格为不复权开盘价(与券商App显示一致);收益%按前复权成交价计算，持仓每日按收盘价估值。</p>
       <div class="table-wrap">
         <table class="trades-table" id="trades-table">
           <caption class="sr-only">全部交易明细,点击表头可排序</caption>
@@ -142,10 +142,12 @@
             <tr>
               <th scope="col" aria-sort="none">序号</th>
               <th scope="col" aria-sort="none">买入类型</th>
+              <th scope="col" aria-sort="none">买入信号日</th>
               <th scope="col" aria-sort="none">买入日期</th>
+              <th scope="col" aria-sort="none">卖出信号日</th>
               <th scope="col" aria-sort="none">卖出日期</th>
-              <th scope="col" aria-sort="none">买价(不复权)</th>
-              <th scope="col" aria-sort="none">卖价(不复权)</th>
+              <th scope="col" aria-sort="none">买入开盘价(不复权)</th>
+              <th scope="col" aria-sort="none">卖出开盘价(不复权)</th>
               <th scope="col" aria-sort="none">收益%</th>
               <th scope="col" aria-sort="none">持仓天</th>
               <th scope="col" aria-sort="none">卖出原因</th>

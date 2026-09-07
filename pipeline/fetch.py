@@ -30,7 +30,7 @@ DIVIDENDS_511260 = [
 
 
 def apply_qfq(df, dividends):
-    """对不复权日线做前复权调整，返回新增 close_raw/high_raw/low_raw/adjust_factor 列的DataFrame"""
+    """对不复权日线做前复权调整，并保留可与券商报价核对的原始 OHLC。"""
     df = df.sort_index()
     factor = np.ones(len(df))
     for ex_str, div in dividends:
@@ -47,6 +47,7 @@ def apply_qfq(df, dividends):
         'high': (df['high'].values * factor).round(3),
         'low': (df['low'].values * factor).round(3),
         'volume': df['volume'].values,
+        'open_raw': df['open'].values,
         'close_raw': df['close'].values,
         'high_raw': df['high'].values,
         'low_raw': df['low'].values,
@@ -62,5 +63,10 @@ def fetch_510880_qfq(count=3000):
 
 def fetch_511260_close(count=2500):
     """拉取511260十年国债ETF前复权收盘价序列（空仓期配置资产, 含现金分红）"""
+    return fetch_511260_qfq(count=count)['close']
+
+
+def fetch_511260_qfq(count=2500):
+    """拉取511260前复权 OHLC；开盘价用于与510880同步的次日开盘调仓。"""
     raw = get_price('sh511260', frequency='1d', count=count)
-    return apply_qfq(raw, DIVIDENDS_511260)['close']
+    return apply_qfq(raw, DIVIDENDS_511260)

@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 
 from .backtest import backtest
-from .fetch import fetch_510880_qfq, fetch_511260_close
+from .fetch import fetch_510880_qfq, fetch_511260_qfq
 from .indicators import add_indicators
 from .share_flow import add_share_flow_indicators, derive_shares_from_scale, fetch_sse_scale_history
 from .strategy import PARAMS, run_strategy
@@ -14,7 +14,7 @@ from .strategy import PARAMS, run_strategy
 SELL_TIER_ORDER = ['硬上限', 'RSI确认', '偏离回落', 'RSI下穿']
 DISPLAY_START = '2018-01-01'
 FLOW_RULE = {'_apply_to': {'b2', 'b3'}, 'flow_z20': 0.0}
-SIGNAL_LAG = 1
+EXECUTION_MODE = 'next_open'
 
 # 真实交易费率: 佣金万0.5(0.005%), 单笔最低0.5元, ETF免印花税
 FEE_RATE = 0.00005
@@ -76,10 +76,10 @@ def build_current_status(df2, latest_position, p=PARAMS):
     latest_signal = int(latest.get('signal', 0))
     if latest_signal == 1:
         buy_level = latest.get('buy_level', '') or '买入'
-        signal_text, signal_level = f'{buy_level}信号触发 | 下一交易日执行', 'buy'
+        signal_text, signal_level = f'{buy_level}收盘信号触发 | 将于下一交易日开盘执行', 'buy'
     elif latest_signal == -1:
         reason = latest.get('sell_reason', '')
-        signal_text, signal_level = f'卖出信号触发 | 下一交易日执行 | {reason}', 'sell'
+        signal_text, signal_level = f'卖出收盘信号触发 | 将于下一交易日开盘执行 | {reason}', 'sell'
     elif holding:
         signal_text, signal_level = '持仓510880 | 持有等待', 'neutral'
     else:
@@ -112,13 +112,19 @@ def build_trades(buys, sells, df2):
         b, s = buys.iloc[j], sells.iloc[j]
         trades.append({
             'seq': j + 1,
+            'buy_signal_date': b['signal_date'].strftime('%Y-%m-%d'),
             'buy_date': b['date'].strftime('%Y-%m-%d'),
             'buy_level': b.get('buy_level', ''),
+            'sell_signal_date': s['signal_date'].strftime('%Y-%m-%d'),
             'sell_date': s['date'].strftime('%Y-%m-%d'),
             'buy_price': round(float(b['price']), 3),
             'sell_price': round(float(s['price']), 3),
             'buy_price_raw': round(float(b['price_raw']), 3),
             'sell_price_raw': round(float(s['price_raw']), 3),
+            'buy_close_price': round(float(b['close_price']), 3),
+            'sell_close_price': round(float(s['close_price']), 3),
+            'buy_close_price_raw': round(float(b['close_price_raw']), 3),
+            'sell_close_price_raw': round(float(s['close_price_raw']), 3),
             'pnl_pct': round(float(s['pnl_pct']), 1),
             'hold_days': int(s['hold_days']),
             'sell_reason': s['reason'],
@@ -130,6 +136,7 @@ def build_trades(buys, sells, df2):
         cur_pnl = (cur_price / b['price'] - 1) * 100
         trades.append({
             'seq': len(sells) + 1,
+            'buy_signal_date': b['signal_date'].strftime('%Y-%m-%d'),
             'buy_date': b['date'].strftime('%Y-%m-%d'),
             'buy_level': b.get('buy_level', ''),
             'sell_date': None,
@@ -137,6 +144,10 @@ def build_trades(buys, sells, df2):
             'sell_price': round(float(cur_price), 3),
             'buy_price_raw': round(float(b['price_raw']), 3),
             'sell_price_raw': round(float(df2.iloc[-1]['close_raw']), 3),
+            'buy_close_price': round(float(b['close_price']), 3),
+            'sell_close_price': round(float(cur_price), 3),
+            'buy_close_price_raw': round(float(b['close_price_raw']), 3),
+            'sell_close_price_raw': round(float(df2.iloc[-1]['close_raw']), 3),
             'pnl_pct': round(float(cur_pnl), 1),
             'hold_days': int((df2.index[-1] - b['date']).days),
             'sell_reason': '未平仓（持有中）',
@@ -209,17 +220,14 @@ def export(output_path, count_510880=3000, count_511260=2500):
     if flow_start is None:
         raise ValueError('510880规模历史不足，无法计算flow_z20')
     df = df[df.index >= flow_start].copy()
-    df_sig = run_strategy(df, PARAMS, flow_rule=FLOW_RULE)
-
-    idle_price = None
-    try:
-        idle_price = fetch_511260_close(count=count_511260)
-    except Exception as e:
-        print(f'511260获取失败,继续但不计空仓收益: {e}')
+    df_sig = run_strategy(
+        df, PARAMS, flow_rule=FLOW_RULE, execution_mode=EXECUTION_MODE,
+    )
+    idle_price = fetch_511260_qfq(count=count_511260)
 
     eq, tr = backtest(
         df_sig, idle_price=idle_price, comm=FEE_RATE, min_comm=FEE_MIN,
-        signal_lag=SIGNAL_LAG,
+        execution_mode=EXECUTION_MODE,
     )
 
     display_start = max(pd.Timestamp(DISPLAY_START), pd.Timestamp(flow_start))
@@ -242,14 +250,14 @@ def export(output_path, count_510880=3000, count_511260=2500):
             'fee_rate': FEE_RATE,
             'min_fee': FEE_MIN,
             'strategy_version': 'flow_z20_on_b2_b3',
-            'signal_lag_days': SIGNAL_LAG,
+            'execution_mode': EXECUTION_MODE,
             'flow_data_source': 'SSE scale / raw close',
             'updated_at': beijing_now.isoformat(),
             'as_of_date': df2.index[-1].strftime('%Y-%m-%d'),
         },
         'current_status': build_current_status(
             df2,
-            0 if tr.empty else int(tr.iloc[-1]['action'] == 'BUY'),
+            int(df2.iloc[-1]['position']),
         ),
         'series': build_series(df2, eq2, dd_series),
         'trades': build_trades(buys, sells, df2),

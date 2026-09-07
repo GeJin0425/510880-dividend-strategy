@@ -23,19 +23,37 @@ def _flow_allows_entry(row, flow_rule, buy_level):
     return True
 
 
-def run_strategy(df, p=PARAMS, flow_rule=None):
+def run_strategy(df, p=PARAMS, flow_rule=None, execution_mode='same_close'):
+    """在逐日循环中形成信号，并在 ``next_open`` 时按真实开盘入场价管理仓位。"""
+    if execution_mode not in {'same_close', 'next_open'}:
+        raise ValueError(f'unsupported execution_mode: {execution_mode}')
+    if execution_mode == 'next_open' and 'open' not in df:
+        raise ValueError('next_open模式需要前复权open列')
     d = df.copy()
     d['signal'] = 0
     d['buy_level'] = ''
     d['sell_reason'] = ''
     d['position'] = 0
+    d['pending_action'] = ''
     pos = 0
     last_sell = -999
     ctx = {}
+    pending = None
 
     for i in range(1, len(d)):
         row = d.iloc[i]
         prev = d.iloc[i - 1]
+
+        # T-1 收盘信号在今天开盘成交；之后才可使用今天收盘指标产生新信号。
+        if execution_mode == 'next_open' and pending is not None:
+            if pending['action'] == 'BUY':
+                pos = 1
+                ctx = {'entry_price': row['open'], 'max_dev': pending['deviation']}
+            else:
+                pos = 0
+                last_sell = i
+                ctx = {}
+            pending = None
         if pd.isna(row['ma250']) or pd.isna(row['rsi']):
             d.iloc[i, d.columns.get_loc('position')] = pos
             continue
@@ -43,7 +61,7 @@ def run_strategy(df, p=PARAMS, flow_rule=None):
         dev = row['deviation']
         rsi = row['rsi']
 
-        if pos == 0 and (i - last_sell) >= p['cooldown']:
+        if pending is None and pos == 0 and (i - last_sell) >= p['cooldown']:
             buy = False
             buy_level = ''
             if dev < p['b1']:
@@ -61,10 +79,14 @@ def run_strategy(df, p=PARAMS, flow_rule=None):
             if buy and _flow_allows_entry(row, flow_rule, buy_level):
                 d.iloc[i, d.columns.get_loc('signal')] = 1
                 d.iloc[i, d.columns.get_loc('buy_level')] = buy_level
-                pos = 1
-                ctx = {'entry_price': row['close'], 'max_dev': dev}
+                if execution_mode == 'next_open':
+                    pending = {'action': 'BUY', 'deviation': dev}
+                    d.iloc[i, d.columns.get_loc('pending_action')] = 'BUY'
+                else:
+                    pos = 1
+                    ctx = {'entry_price': row['close'], 'max_dev': dev}
 
-        elif pos == 1:
+        elif pending is None and pos == 1:
             ctx['max_dev'] = max(ctx.get('max_dev', 0), dev)
             max_dev = ctx['max_dev']
             profit = (row['close'] / ctx.get('entry_price', row['close']) - 1) * 100
@@ -83,9 +105,13 @@ def run_strategy(df, p=PARAMS, flow_rule=None):
             if sell:
                 d.iloc[i, d.columns.get_loc('signal')] = -1
                 d.iloc[i, d.columns.get_loc('sell_reason')] = reason
-                pos = 0
-                last_sell = i
-                ctx = {}
+                if execution_mode == 'next_open':
+                    pending = {'action': 'SELL'}
+                    d.iloc[i, d.columns.get_loc('pending_action')] = 'SELL'
+                else:
+                    pos = 0
+                    last_sell = i
+                    ctx = {}
 
         d.iloc[i, d.columns.get_loc('position')] = pos
     return d

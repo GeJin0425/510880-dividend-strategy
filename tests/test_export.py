@@ -48,6 +48,8 @@ def test_export_end_to_end(tmp_path, monkeypatch):
     assert payload['meta']['trade_count'] >= 1
     assert len(payload['trades']) >= 1
     assert payload['trades'][0]['sell_reason']
+    assert 'buy_signal_close_price' in payload['trades'][0]
+    assert 'sell_signal_close_price' in payload['trades'][0]
     assert payload['current_status']['date'] == fixture_df.index[-1].strftime('%Y-%m-%d')
     for key in ('dates', 'close', 'ma250', 'rsi14', 'macd', 'equity_strategy'):
         assert key in payload['series']

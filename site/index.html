@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="上证红利ETF(510880)MA250均值回归策略仪表盘:价格与MA250、区间收益、回撤、交易明细,每日自动更新。历史回测不代表未来收益。">
+<meta name="description" content="上证红利ETF(510880)MA250均值回归与ETF份额资金流策略仪表盘，每日自动更新。历史回测不代表未来收益。">
 <meta name="theme-color" content="#0B1220">
-<meta property="og:title" content="510880 红利ETF · MA250策略仪表盘">
-<meta property="og:description" content="MA250均值回归策略回测与每日信号,2018年至今回测年化约23%。历史数据不代表未来收益。">
+<meta property="og:title" content="510880 红利ETF · MA250 + 份额资金流策略">
+<meta property="og:description" content="MA250均值回归结合ETF份额资金流过滤的回测与每日信号。历史数据不代表未来收益。">
 <meta property="og:type" content="website">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
-<title>510880 红利ETF · MA250策略仪表盘</title>
+<title>510880 红利ETF · MA250 + 份额资金流策略</title>
 <script>
 (function () {
   try {
@@ -31,7 +31,7 @@
   <header class="topbar">
     <div class="brand">
       <span id="status-dot" class="status-dot idle" role="img" aria-label="策略状态:加载中"></span>
-      <h1>510880 红利ETF · MA250策略</h1>
+      <h1>510880 红利ETF · MA250 + 份额资金流</h1>
     </div>
     <div class="topbar-side">
       <span id="updated-at" class="updated-at">数据加载中…</span>
@@ -103,6 +103,12 @@
     </details>
 
     <details class="panel collapsible">
+      <summary>ETF份额资金流</summary>
+      <div class="chart" id="chart-flow"></div>
+      <p class="sr-only" id="chart-flow-summary"></p>
+    </details>
+
+    <details class="panel collapsible">
       <summary>MACD</summary>
       <div class="chart" id="chart-macd"></div>
       <p class="sr-only" id="chart-macd-summary"></p>
@@ -135,6 +141,7 @@
           <thead>
             <tr>
               <th scope="col" aria-sort="none">序号</th>
+              <th scope="col" aria-sort="none">买入类型</th>
               <th scope="col" aria-sort="none">买入日期</th>
               <th scope="col" aria-sort="none">卖出日期</th>
               <th scope="col" aria-sort="none">买价(不复权)</th>
@@ -151,7 +158,7 @@
   </main>
 
   <footer class="footer">
-    <p>数据来源:新浪/腾讯财经(510880/511260日线) | 每日北京时间15:40自动更新</p>
+    <p>数据来源:新浪/腾讯财经(日线)及上交所公开基金规模 | 每日北京时间15:40自动更新</p>
     <p class="disclaimer">本页面为个人量化研究记录,不构成投资建议。历史回测结果不代表未来收益。</p>
   </footer>
 

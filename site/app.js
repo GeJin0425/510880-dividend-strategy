@@ -12,7 +12,7 @@ const state = {
 const charts = [];
 let currentTrades = [];
 let sortState = { key: 'seq', dir: 1 };
-const TRADE_COLUMN_KEYS = ['seq', 'buy_date', 'sell_date', 'buy_price_raw', 'sell_price_raw', 'pnl_pct', 'hold_days', 'sell_reason'];
+const TRADE_COLUMN_KEYS = ['seq', 'buy_level', 'buy_date', 'sell_date', 'buy_price_raw', 'sell_price_raw', 'pnl_pct', 'hold_days', 'sell_reason'];
 
 async function main() {
   initTheme();
@@ -233,6 +233,7 @@ function renderAll(data) {
   renderReturnsPanel(data);
   renderDeviationChart(data.series);
   renderRsiChart(data.series);
+  renderFlowChart(data.series);
   renderMacdChart(data.series);
   renderEquityChart(data.series);
   renderDrawdownChart(data.series);
@@ -292,6 +293,9 @@ function renderStatusCard(status) {
       <div><span class="k">偏离度</span>${fmtSigned(status.deviation_pct)}</div>
       <div><span class="k">RSI14 / RSI6</span>${status.rsi14} / ${status.rsi6}</div>
       <div><span class="k">MA250斜率</span>${fmtSigned(status.ma250_slope_pct)}</div>
+      <div><span class="k">5日份额对数变化</span>${fmtSigned(status.share_flow_5_pct)}</div>
+      <div><span class="k">20日份额对数变化</span>${fmtSigned(status.share_flow_20_pct)}</div>
+      <div><span class="k">资金流Z值</span>${status.flow_z20}</div>
       <div><span class="k">卖出监控价</span>¥${status.sell_trigger_price_soft}</div>
       <div><span class="k">硬卖价</span>¥${status.sell_trigger_price_hard}</div>
       <div><span class="k">买入上限价</span>¥${status.buy_trigger_price_cap}</div>
@@ -531,13 +535,13 @@ function renderDeviationChart(series) {
         type: 'bar',
         data: series.deviation,
         barMaxWidth: 4,
-        itemStyle: { color: (point) => (point.value >= 7 ? p.down : point.value >= 0 ? p.up : p.accent) },
+        itemStyle: { color: (point) => (point.value >= 5 ? p.down : point.value >= 0 ? p.up : p.accent) },
         markLine: {
           symbol: 'none',
           label: { position: 'insideEndTop', fontSize: 10 },
           data: [
-            { yAxis: 7, name: '卖出监控', lineStyle: { color: p.down, type: 'dashed' }, label: { formatter: '+7 卖出监控', color: p.down } },
-            { yAxis: -2, name: '买入区', lineStyle: { color: p.up, type: 'dashed' }, label: { formatter: '-2 买入区', color: p.up } },
+            { yAxis: 5, name: 'RSI卖出确认起点', lineStyle: { color: p.down, type: 'dashed' }, label: { formatter: '+5 RSI确认', color: p.down } },
+            { yAxis: -1.67, name: 'b1买入线', lineStyle: { color: p.up, type: 'dashed' }, label: { formatter: '-1.67 b1', color: p.up } },
             { yAxis: 0, lineStyle: { color: p.axis }, label: { show: false } },
           ],
         },
@@ -547,7 +551,7 @@ function renderDeviationChart(series) {
   registerChart('chart-deviation', buildOption);
   const lastIdx = series.dates.length - 1;
   document.getElementById('chart-deviation-summary').textContent =
-    `偏离度柱状图,阈值线标注+7%卖出监控区与-2%买入区。最新偏离度${series.deviation[lastIdx]}%。`;
+    `偏离度柱状图,阈值线标注+5% RSI卖出确认起点与-1.67% b1买入线。最新偏离度${series.deviation[lastIdx]}%。`;
 }
 
 function renderRsiChart(series) {
@@ -568,8 +572,8 @@ function renderRsiChart(series) {
             symbol: 'none',
             label: { position: 'insideEndTop', fontSize: 10 },
             data: [
-              { yAxis: 75, name: '卖出确认', lineStyle: { color: p.down, type: 'dashed' }, label: { formatter: '75 卖出确认', color: p.down } },
-              { yAxis: 30, name: '超卖区', lineStyle: { color: p.up, type: 'dashed' }, label: { formatter: '30 超卖区', color: p.up } },
+              { yAxis: 77.5, name: '卖出确认', lineStyle: { color: p.down, type: 'dashed' }, label: { formatter: '77.5 卖出确认', color: p.down } },
+              { yAxis: 31.67, name: 'b2超卖线', lineStyle: { color: p.up, type: 'dashed' }, label: { formatter: '31.67 b2', color: p.up } },
             ],
           },
         },
@@ -580,7 +584,37 @@ function renderRsiChart(series) {
   registerChart('chart-rsi', buildOption);
   const lastIdx = series.dates.length - 1;
   document.getElementById('chart-rsi-summary').textContent =
-    `RSI走势图,标注75卖出确认线与30超卖线。最新RSI14为${series.rsi14[lastIdx]},RSI6为${series.rsi6[lastIdx]}。`;
+    `RSI走势图,标注77.5卖出确认线与31.67 b2超卖线。最新RSI14为${series.rsi14[lastIdx]},RSI6为${series.rsi6[lastIdx]}。`;
+}
+
+function renderFlowChart(series) {
+  function buildOption() {
+    const p = palette();
+    return {
+      ...chartBase(p),
+      grid: chartGrid(p),
+      legend: { data: ['5日份额变化', '20日份额变化', 'flow_z20'], textStyle: { color: p.dim }, top: 0, itemWidth: 16, itemHeight: 8 },
+      xAxis: { type: 'category', data: series.dates, ...chartAxis(p) },
+      yAxis: [
+        { type: 'value', ...chartAxis(p), axisLabel: { color: p.dim, formatter: '{value}%' } },
+        { type: 'value', ...chartAxis(p), splitLine: { show: false } },
+      ],
+      dataZoom: [{ type: 'inside' }],
+      series: [
+        { name: '5日份额变化', type: 'line', data: series.share_flow_5_pct, showSymbol: false, lineStyle: { width: 1, color: p.accent, opacity: 0.6 } },
+        { name: '20日份额变化', type: 'line', data: series.share_flow_20_pct, showSymbol: false, lineStyle: { width: 1.5, color: p.warn } },
+        {
+          name: 'flow_z20', type: 'line', yAxisIndex: 1, data: series.flow_z20, showSymbol: false,
+          lineStyle: { width: 1.8, color: p.purple },
+          markLine: { symbol: 'none', label: { formatter: 'b2/b3门槛 0', color: p.up }, data: [{ yAxis: 0, lineStyle: { color: p.up, type: 'dashed' } }] },
+        },
+      ],
+    };
+  }
+  registerChart('chart-flow', buildOption);
+  const lastIdx = series.dates.length - 1;
+  document.getElementById('chart-flow-summary').textContent =
+    `ETF份额资金流走势图。最新20日份额对数变化${series.share_flow_20_pct[lastIdx]}%，flow_z20为${series.flow_z20[lastIdx]}；b2和b3要求flow_z20不低于0。`;
 }
 
 function renderMacdChart(series) {
@@ -718,6 +752,7 @@ function drawTradesBody() {
   tbody.innerHTML = rows.map((t) => `
     <tr class="${t.open ? 'open-row' : ''}">
       <td>${t.seq}</td>
+      <td>${t.buy_level || '—'}</td>
       <td>${t.buy_date}</td>
       <td>${t.sell_date ?? '持仓中…'}</td>
       <td>${t.buy_price_raw}</td>

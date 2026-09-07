@@ -20,7 +20,20 @@ def test_run_strategy_extreme_buy_then_hard_sell():
     out = run_strategy(df, p=PARAMS)
 
     assert out['signal'].iloc[3] == 1
+    assert out['buy_level'].iloc[3] == 'b1'
     assert out['signal'].iloc[4] == -1
     assert '硬上限' in out['sell_reason'].iloc[4]
     assert out['position'].iloc[4] == 0
     assert out['position'].iloc[3] == 1
+
+
+def test_flow_rule_can_veto_but_not_create_an_entry():
+    rows = [_row(100, 100, 50) for _ in range(3)]
+    rows.append({**_row(97, 100, 50), 'share_flow_20': -0.01})
+    rows.append({**_row(97, 100, 50), 'share_flow_20': 0.01})
+    df = pd.DataFrame(rows)
+
+    out = run_strategy(df, p=PARAMS, flow_rule={'share_flow_20': 0.0})
+
+    assert out['signal'].iloc[3] == 0
+    assert out['signal'].iloc[4] == 1

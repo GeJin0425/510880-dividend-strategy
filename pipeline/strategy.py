@@ -7,9 +7,26 @@ PARAMS = dict(
 )
 
 
-def run_strategy(df, p=PARAMS):
+def _flow_allows_entry(row, flow_rule, buy_level):
+    """Return whether an otherwise-valid entry passes an optional flow rule."""
+    if not flow_rule:
+        return True
+    apply_to = flow_rule.get('_apply_to')
+    if apply_to and buy_level not in apply_to:
+        return True
+    for column, minimum in flow_rule.items():
+        if column.startswith('_'):
+            continue
+        value = row.get(column)
+        if pd.isna(value) or value < minimum:
+            return False
+    return True
+
+
+def run_strategy(df, p=PARAMS, flow_rule=None):
     d = df.copy()
     d['signal'] = 0
+    d['buy_level'] = ''
     d['sell_reason'] = ''
     d['position'] = 0
     pos = 0
@@ -28,17 +45,22 @@ def run_strategy(df, p=PARAMS):
 
         if pos == 0 and (i - last_sell) >= p['cooldown']:
             buy = False
+            buy_level = ''
             if dev < p['b1']:
                 buy = True
+                buy_level = 'b1'
             elif dev < p['b2'] and rsi < p['b2r']:
                 buy = True
+                buy_level = 'b2'
             else:
                 slope = row['ma250_slope'] if not pd.isna(row['ma250_slope']) else 0
                 above_ma10 = row['close'] > row['ma10'] if not pd.isna(row['ma10']) else False
                 if p['b3lo'] <= dev <= p['b3hi'] and slope > 0 and above_ma10:
                     buy = True
-            if buy:
+                    buy_level = 'b3'
+            if buy and _flow_allows_entry(row, flow_rule, buy_level):
                 d.iloc[i, d.columns.get_loc('signal')] = 1
+                d.iloc[i, d.columns.get_loc('buy_level')] = buy_level
                 pos = 1
                 ctx = {'entry_price': row['close'], 'max_dev': dev}
 

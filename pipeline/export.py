@@ -8,10 +8,13 @@ import pandas as pd
 from .backtest import backtest
 from .fetch import fetch_510880_qfq, fetch_511260_close
 from .indicators import add_indicators
+from .share_flow import add_share_flow_indicators, derive_shares_from_scale, fetch_sse_scale_history
 from .strategy import PARAMS, run_strategy
 
 SELL_TIER_ORDER = ['硬上限', 'RSI确认', '偏离回落', 'RSI下穿']
 DISPLAY_START = '2018-01-01'
+FLOW_RULE = {'_apply_to': {'b2', 'b3'}, 'flow_z20': 0.0}
+SIGNAL_LAG = 1
 
 # 真实交易费率: 佣金万0.5(0.005%), 单笔最低0.5元, ETF免印花税
 FEE_RATE = 0.00005
@@ -60,30 +63,27 @@ def compute_holding_pct(buys, sells, df2):
     return round(in_pos_days / hold_days * 100, 0)
 
 
-def build_current_status(df2, latest_position):
+def build_current_status(df2, latest_position, p=PARAMS):
     latest = df2.iloc[-1]
     dev = latest['deviation']
     rsi = latest['rsi']
     ma250_raw = latest['close_raw'] / (1 + dev / 100)
-    sell_soft = ma250_raw * 1.07
-    sell_hard = ma250_raw * 1.14
-    buy_cap = ma250_raw * 1.04
+    sell_soft = ma250_raw * (1 + p['s2'] / 100)
+    sell_hard = ma250_raw * (1 + p['s1'] / 100)
+    buy_cap = ma250_raw * (1 + p['b3hi'] / 100)
 
     holding = bool(latest_position == 1)
-    if holding:
-        if dev >= 7.0 and rsi >= 75:
-            signal_text, signal_level = '卖出信号触发!', 'sell'
-        elif dev >= 7.0:
-            signal_text, signal_level = '持仓510880 | 卖出监控中', 'watch'
-        else:
-            signal_text, signal_level = '持仓510880 | 持有等待', 'neutral'
+    latest_signal = int(latest.get('signal', 0))
+    if latest_signal == 1:
+        buy_level = latest.get('buy_level', '') or '买入'
+        signal_text, signal_level = f'{buy_level}信号触发 | 下一交易日执行', 'buy'
+    elif latest_signal == -1:
+        reason = latest.get('sell_reason', '')
+        signal_text, signal_level = f'卖出信号触发 | 下一交易日执行 | {reason}', 'sell'
+    elif holding:
+        signal_text, signal_level = '持仓510880 | 持有等待', 'neutral'
     else:
-        if dev < -2:
-            signal_text, signal_level = '空仓国债 | 极端买入触发!', 'buy'
-        elif 0 <= dev <= 4:
-            signal_text, signal_level = '空仓国债 | 接近买入区', 'watch'
-        else:
-            signal_text, signal_level = '空仓国债 | 等待回落', 'neutral'
+        signal_text, signal_level = '空仓国债 | 等待买入信号', 'neutral'
 
     return {
         'holding': holding,
@@ -95,6 +95,9 @@ def build_current_status(df2, latest_position):
         'rsi14': round(float(rsi), 0),
         'rsi6': round(float(latest['rsi6']), 0),
         'ma250_slope_pct': round(float(latest['ma250_slope']), 2),
+        'share_flow_5_pct': round(float(latest['share_flow_5']) * 100, 2),
+        'share_flow_20_pct': round(float(latest['share_flow_20']) * 100, 2),
+        'flow_z20': round(float(latest['flow_z20']), 2),
         'sell_trigger_price_soft': round(float(sell_soft), 3),
         'sell_trigger_price_hard': round(float(sell_hard), 3),
         'buy_trigger_price_cap': round(float(buy_cap), 3),
@@ -110,6 +113,7 @@ def build_trades(buys, sells, df2):
         trades.append({
             'seq': j + 1,
             'buy_date': b['date'].strftime('%Y-%m-%d'),
+            'buy_level': b.get('buy_level', ''),
             'sell_date': s['date'].strftime('%Y-%m-%d'),
             'buy_price': round(float(b['price']), 3),
             'sell_price': round(float(s['price']), 3),
@@ -127,6 +131,7 @@ def build_trades(buys, sells, df2):
         trades.append({
             'seq': len(sells) + 1,
             'buy_date': b['date'].strftime('%Y-%m-%d'),
+            'buy_level': b.get('buy_level', ''),
             'sell_date': None,
             'buy_price': round(float(b['price']), 3),
             'sell_price': round(float(cur_price), 3),
@@ -179,6 +184,9 @@ def build_series(df2, eq2, dd_series):
         'macd': _safe_list(df2['macd'], 4),
         'macd_signal': _safe_list(df2['macd_signal'], 4),
         'macd_hist': _safe_list(df2['macd_hist'], 4),
+        'share_flow_5_pct': _safe_list(df2['share_flow_5'] * 100, 2),
+        'share_flow_20_pct': _safe_list(df2['share_flow_20'] * 100, 2),
+        'flow_z20': _safe_list(df2['flow_z20'], 2),
         'equity_strategy': _safe_list(eq_aligned, 0),
         'equity_buyhold': _safe_list(bh, 0),
         'drawdown_pct': _safe_list(dd_aligned, 2),
@@ -191,8 +199,17 @@ def export(output_path, count_510880=3000, count_511260=2500):
         raise ValueError(
             f'510880数据只拉到{len(raw)}条,远少于预期,可能是接口返回被截断'
         )
-    df = add_indicators(raw)
-    df_sig = run_strategy(df, PARAMS)
+    scale = fetch_sse_scale_history('510880')
+    if len(scale) < 300:
+        raise ValueError(f'510880规模数据只有{len(scale)}条，无法可靠计算资金流标准分')
+    df = add_indicators(raw).join(scale, how='inner')
+    df['shares'] = derive_shares_from_scale(df['scale_yi'], df['close_raw'])
+    df = add_share_flow_indicators(df)
+    flow_start = df['flow_z20'].first_valid_index()
+    if flow_start is None:
+        raise ValueError('510880规模历史不足，无法计算flow_z20')
+    df = df[df.index >= flow_start].copy()
+    df_sig = run_strategy(df, PARAMS, flow_rule=FLOW_RULE)
 
     idle_price = None
     try:
@@ -200,12 +217,16 @@ def export(output_path, count_510880=3000, count_511260=2500):
     except Exception as e:
         print(f'511260获取失败,继续但不计空仓收益: {e}')
 
-    eq, tr = backtest(df_sig, idle_price=idle_price, comm=FEE_RATE, min_comm=FEE_MIN)
+    eq, tr = backtest(
+        df_sig, idle_price=idle_price, comm=FEE_RATE, min_comm=FEE_MIN,
+        signal_lag=SIGNAL_LAG,
+    )
 
-    df2 = df_sig[df_sig.index >= DISPLAY_START].copy()
-    eq2 = eq[eq.index >= DISPLAY_START].copy()
-    buys = tr[(tr['action'] == 'BUY') & (tr['date'] >= DISPLAY_START)].reset_index(drop=True)
-    sells = tr[(tr['action'] == 'SELL') & (tr['date'] >= DISPLAY_START)].reset_index(drop=True)
+    display_start = max(pd.Timestamp(DISPLAY_START), pd.Timestamp(flow_start))
+    df2 = df_sig[df_sig.index >= display_start].copy()
+    eq2 = eq[eq.index >= display_start].copy()
+    buys = tr[(tr['action'] == 'BUY') & (tr['date'] >= display_start)].reset_index(drop=True)
+    sells = tr[(tr['action'] == 'SELL') & (tr['date'] >= display_start)].reset_index(drop=True)
 
     if len(sells) == 0:
         raise ValueError('回测区间内没有任何已平仓交易，无法计算统计指标——检查策略参数或数据是否异常')
@@ -220,10 +241,16 @@ def export(output_path, count_510880=3000, count_511260=2500):
             **stats,
             'fee_rate': FEE_RATE,
             'min_fee': FEE_MIN,
+            'strategy_version': 'flow_z20_on_b2_b3',
+            'signal_lag_days': SIGNAL_LAG,
+            'flow_data_source': 'SSE scale / raw close',
             'updated_at': beijing_now.isoformat(),
             'as_of_date': df2.index[-1].strftime('%Y-%m-%d'),
         },
-        'current_status': build_current_status(df2, df2.iloc[-1]['position']),
+        'current_status': build_current_status(
+            df2,
+            0 if tr.empty else int(tr.iloc[-1]['action'] == 'BUY'),
+        ),
         'series': build_series(df2, eq2, dd_series),
         'trades': build_trades(buys, sells, df2),
         'sell_reason_breakdown': build_sell_reason_breakdown(sells),

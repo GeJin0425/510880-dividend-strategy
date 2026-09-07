@@ -10,10 +10,10 @@ def _build_fixture():
     # 总长度需 >= export.py 的 400 条最小史长哨兵检查（见 export() 里的截断保护）
     dates = pd.date_range('2018-01-01', periods=410, freq='D')
     prices = np.concatenate([
-        np.full(260, 100.0),               # 260天平盘，喂饱MA250热身期
+        np.full(300, 100.0),               # 平盘，喂饱MA250与资金流热身期
         [95.0],                             # 急跌 -> 偏离度<-2% 触发L1买入
         np.linspace(96.0, 118.0, 19),        # 连续拉升
-        np.full(130, 118.0),                # 高位横盘
+        np.full(90, 118.0),                 # 高位横盘
     ])
     df = pd.DataFrame({
         'open': prices, 'close': prices, 'high': prices, 'low': prices,
@@ -22,13 +22,16 @@ def _build_fixture():
         'adjust_factor': np.ones(410),
     }, index=dates)
     idle = pd.Series(np.full(410, 100.0), index=dates)
-    return df, idle
+    shares = np.exp(np.arange(410) * 0.0005 + np.sin(np.arange(410) / 11) * 0.01)
+    scale = pd.DataFrame({'scale_yi': shares * prices}, index=dates)
+    return df, idle, scale
 
 
 def test_export_end_to_end(tmp_path, monkeypatch):
-    fixture_df, fixture_idle = _build_fixture()
+    fixture_df, fixture_idle, fixture_scale = _build_fixture()
     monkeypatch.setattr(export_mod, 'fetch_510880_qfq', lambda count=3000: fixture_df)
     monkeypatch.setattr(export_mod, 'fetch_511260_close', lambda count=2500: fixture_idle)
+    monkeypatch.setattr(export_mod, 'fetch_sse_scale_history', lambda fund_code='510880': fixture_scale)
     # 跳过前250+天MA250热身期，避免展示窗口内出现NaN
     monkeypatch.setattr(export_mod, 'DISPLAY_START', fixture_df.index[255].strftime('%Y-%m-%d'))
 
@@ -53,24 +56,29 @@ def test_build_current_status_sell_signal_triggered():
     dates = pd.date_range('2020-01-01', periods=1)
     df2 = pd.DataFrame({
         'close_raw': [10.7], 'deviation': [7.5], 'rsi': [80.0], 'rsi6': [82.0],
-        'ma250': [10.0], 'ma250_slope': [0.3],
+        'ma250': [10.0], 'ma250_slope': [0.3], 'signal': [-1],
+        'sell_reason': ['RSI确认'], 'share_flow_5': [0.01],
+        'share_flow_20': [0.02], 'flow_z20': [0.5],
     }, index=dates)
     status = export_mod.build_current_status(df2, latest_position=1)
     assert status['holding'] is True
     assert status['signal_level'] == 'sell'
-    assert status['signal_text'] == '卖出信号触发!'
+    assert '卖出信号触发' in status['signal_text']
+    assert '下一交易日执行' in status['signal_text']
 
 
 def test_build_current_status_idle_buy_triggered():
     dates = pd.date_range('2020-01-01', periods=1)
     df2 = pd.DataFrame({
         'close_raw': [9.7], 'deviation': [-3.0], 'rsi': [30.0], 'rsi6': [28.0],
-        'ma250': [10.0], 'ma250_slope': [-0.1],
+        'ma250': [10.0], 'ma250_slope': [-0.1], 'signal': [1],
+        'buy_level': ['b1'], 'share_flow_5': [-0.01],
+        'share_flow_20': [-0.02], 'flow_z20': [-0.5],
     }, index=dates)
     status = export_mod.build_current_status(df2, latest_position=0)
     assert status['holding'] is False
     assert status['signal_level'] == 'buy'
-    assert status['signal_text'] == '空仓国债 | 极端买入触发!'
+    assert status['signal_text'] == 'b1信号触发 | 下一交易日执行'
 
 
 def test_build_sell_reason_breakdown_groups_by_tier():

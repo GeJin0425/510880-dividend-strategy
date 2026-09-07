@@ -1,7 +1,8 @@
 import pandas as pd
 
 
-def backtest(df, idle_price=None, initial=100000, comm=0.001, min_comm=0.0):
+def backtest(df, idle_price=None, initial=100000, comm=0.001, min_comm=0.0,
+             signal_lag=0):
     """回测引擎: 持仓510880 + 空仓期买入十年国债ETF
 
     佣金按每笔成交额计算: max(成交额 * comm, min_comm)。
@@ -17,8 +18,12 @@ def backtest(df, idle_price=None, initial=100000, comm=0.001, min_comm=0.0):
     def fee(notional):
         return max(notional * comm, min_comm)
 
+    if signal_lag < 0:
+        raise ValueError('signal_lag must be non-negative')
+
     for i in range(len(df)):
-        sig = df.iloc[i]['signal']
+        source_i = i - signal_lag
+        sig = df.iloc[source_i]['signal'] if source_i >= 0 else 0
         close = df.iloc[i]['close']
         date = df.index[i]
         idle_close = idle_price.loc[date] if (idle_price is not None and date in idle_price.index) else None
@@ -33,6 +38,7 @@ def backtest(df, idle_price=None, initial=100000, comm=0.001, min_comm=0.0):
             trades.append({
                 'date': date, 'action': 'BUY', 'price': close, 'shares': s,
                 'price_raw': df.iloc[i]['close_raw'],
+                'buy_level': df.iloc[source_i].get('buy_level', ''),
             })
         elif sig == -1 and shares > 0:
             capital += shares * close - fee(shares * close)
@@ -41,7 +47,7 @@ def backtest(df, idle_price=None, initial=100000, comm=0.001, min_comm=0.0):
                 'date': date, 'action': 'SELL', 'price': close, 'shares': shares,
                 'price_raw': df.iloc[i]['close_raw'],
                 'pnl_pct': pnl, 'hold_days': (date - trades[-1]['date']).days,
-                'reason': df.iloc[i]['sell_reason'],
+                'reason': df.iloc[source_i]['sell_reason'],
             })
             shares = 0
             if idle_close and idle_close > 0:

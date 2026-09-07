@@ -61,7 +61,10 @@ def add_share_flow_indicators(df, share_col="shares", z_window=252):
     d["share_flow_20"] = log_shares.diff(20)
     rolling_mean = d["share_flow_20"].rolling(z_window).mean()
     rolling_std = d["share_flow_20"].rolling(z_window).std(ddof=0)
-    d["flow_z20"] = (d["share_flow_20"] - rolling_mean) / rolling_std.replace(0, np.nan)
+    # Numerically constant windows can leave a tiny non-zero float on some
+    # pandas/numpy versions; treat them as zero variance consistently.
+    rolling_std = rolling_std.mask(rolling_std.abs() < 1e-12)
+    d["flow_z20"] = (d["share_flow_20"] - rolling_mean) / rolling_std
     return d
 
 

@@ -106,10 +106,20 @@ def build_current_status(df2, latest_position, p=PARAMS):
     }
 
 
-def build_trades(buys, sells, df2):
+def build_trades(buys, sells, prices):
+    """Build execution records plus close-price coordinates for signal markers."""
+    def signal_close(event):
+        signal_row = prices.loc[event['signal_date']]
+        return (
+            round(float(signal_row['close']), 3),
+            round(float(signal_row['close_raw']), 3),
+        )
+
     trades = []
     for j in range(min(len(buys), len(sells))):
         b, s = buys.iloc[j], sells.iloc[j]
+        buy_signal_close, buy_signal_close_raw = signal_close(b)
+        sell_signal_close, sell_signal_close_raw = signal_close(s)
         trades.append({
             'seq': j + 1,
             'buy_signal_date': b['signal_date'].strftime('%Y-%m-%d'),
@@ -121,6 +131,10 @@ def build_trades(buys, sells, df2):
             'sell_price': round(float(s['price']), 3),
             'buy_price_raw': round(float(b['price_raw']), 3),
             'sell_price_raw': round(float(s['price_raw']), 3),
+            'buy_signal_close_price': buy_signal_close,
+            'sell_signal_close_price': sell_signal_close,
+            'buy_signal_close_price_raw': buy_signal_close_raw,
+            'sell_signal_close_price_raw': sell_signal_close_raw,
             'buy_close_price': round(float(b['close_price']), 3),
             'sell_close_price': round(float(s['close_price']), 3),
             'buy_close_price_raw': round(float(b['close_price_raw']), 3),
@@ -132,7 +146,8 @@ def build_trades(buys, sells, df2):
         })
     if len(buys) > len(sells):
         b = buys.iloc[len(sells)]
-        cur_price = df2.iloc[-1]['close']
+        buy_signal_close, buy_signal_close_raw = signal_close(b)
+        cur_price = prices.iloc[-1]['close']
         cur_pnl = (cur_price / b['price'] - 1) * 100
         trades.append({
             'seq': len(sells) + 1,
@@ -143,13 +158,17 @@ def build_trades(buys, sells, df2):
             'buy_price': round(float(b['price']), 3),
             'sell_price': round(float(cur_price), 3),
             'buy_price_raw': round(float(b['price_raw']), 3),
-            'sell_price_raw': round(float(df2.iloc[-1]['close_raw']), 3),
+            'sell_price_raw': round(float(prices.iloc[-1]['close_raw']), 3),
+            'buy_signal_close_price': buy_signal_close,
+            'sell_signal_close_price': round(float(cur_price), 3),
+            'buy_signal_close_price_raw': buy_signal_close_raw,
+            'sell_signal_close_price_raw': round(float(prices.iloc[-1]['close_raw']), 3),
             'buy_close_price': round(float(b['close_price']), 3),
             'sell_close_price': round(float(cur_price), 3),
             'buy_close_price_raw': round(float(b['close_price_raw']), 3),
             'sell_close_price_raw': round(float(df2.iloc[-1]['close_raw']), 3),
             'pnl_pct': round(float(cur_pnl), 1),
-            'hold_days': int((df2.index[-1] - b['date']).days),
+            'hold_days': int((prices.index[-1] - b['date']).days),
             'sell_reason': '未平仓（持有中）',
             'open': True,
         })
@@ -260,7 +279,7 @@ def export(output_path, count_510880=3000, count_511260=2500):
             int(df2.iloc[-1]['position']),
         ),
         'series': build_series(df2, eq2, dd_series),
-        'trades': build_trades(buys, sells, df2),
+        'trades': build_trades(buys, sells, df_sig),
         'sell_reason_breakdown': build_sell_reason_breakdown(sells),
     }
 

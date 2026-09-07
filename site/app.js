@@ -342,20 +342,23 @@ function renderPriceChart(data) {
     const firstDate = dates[0] ?? '';
 
     const buyPoints = trades
-      .filter((t) => t.buy_date >= firstDate)
+      .filter((t) => t.buy_signal_date >= firstDate)
       .map((t) => ({
-        coord: [t.buy_date, t.buy_price],
-        value: t.buy_date,
+        // 图上标记表示收盘时可见的信号；成交与收益仍以次日开盘价计算。
+        name: '收盘买入信号（次日开盘成交）',
+        coord: [t.buy_signal_date, t.buy_signal_close_price],
+        value: t.buy_signal_date,
         symbol: 'triangle',
         symbolSize: 13,
         itemStyle: { color: p.up },
         label: { show: true, formatter: '买', position: 'top', color: p.up, fontSize: 10, fontWeight: 600, backgroundColor: p.tooltipBg, borderColor: p.up, borderWidth: 1, padding: [1, 4], borderRadius: 4 },
       }));
     const sellPoints = trades
-      .filter((t) => t.sell_date && t.sell_date >= firstDate)
+      .filter((t) => t.sell_signal_date && t.sell_signal_date >= firstDate)
       .map((t) => ({
-        coord: [t.sell_date, t.sell_price],
-        value: t.sell_date,
+        name: '收盘卖出信号（次日开盘成交）',
+        coord: [t.sell_signal_date, t.sell_signal_close_price],
+        value: t.sell_signal_date,
         symbol: 'pin',
         symbolSize: 14,
         itemStyle: { color: p.down },

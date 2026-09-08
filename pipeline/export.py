@@ -10,7 +10,7 @@ from .event_engine import simulate
 from .fetch import fetch_510880_qfq, fetch_511260_qfq
 from .indicators import add_indicators
 from .share_flow import add_share_flow_indicators, derive_shares_from_scale, fetch_sse_scale_history
-from .strategy import PARAMS, run_strategy
+from .strategy import PARAMS, PARAMS_VERSION, run_strategy
 
 SELL_TIER_ORDER = ['硬上限', 'RSI确认', '偏离回落', 'RSI下穿']
 DISPLAY_START = '2018-01-01'
@@ -275,7 +275,8 @@ def export(output_path, count_510880=3000, count_511260=2500):
             **stats,
             'fee_rate': FEE_RATE,
             'min_fee': FEE_MIN,
-            'strategy_version': 'flow_z20_on_b2_b3',
+            'strategy_version': f'flow_z20_on_b2_b3__{PARAMS_VERSION}',
+            'parameter_set': PARAMS_VERSION,
             'execution_mode': EXECUTION_MODE,
             'flow_data_source': 'SSE scale / raw close',
             'updated_at': beijing_now.isoformat(),

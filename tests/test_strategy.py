@@ -14,7 +14,7 @@ def _row(close, ma250, rsi, ma10=None, slope=0.1):
 def test_run_strategy_extreme_buy_then_hard_sell():
     rows = [_row(100, 100, 50) for _ in range(3)]  # 平盘期，above_ma10不成立，不会误触发L3买入
     rows.append(_row(97, 100, 50))    # dev=-3% < b1(-2%) -> L1买入
-    rows.append(_row(114, 100, 50))   # dev=14% >= s1(14%) -> 硬上限卖出
+    rows.append(_row(118, 100, 50))   # dev=18% >= s1(16%) -> 硬上限卖出
     df = pd.DataFrame(rows)
 
     out = run_strategy(df, p=PARAMS)

@@ -47,6 +47,7 @@ def test_export_end_to_end(tmp_path, monkeypatch):
     assert reloaded == payload
 
     assert payload['meta']['trade_count'] >= 1
+    assert payload['meta']['parameter_set'] == 'next_open_candidate_a'
     assert len(payload['trades']) >= 1
     assert payload['trades'][0]['sell_reason']
     assert 'buy_signal_close_price' in payload['trades'][0]

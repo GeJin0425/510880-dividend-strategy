@@ -1,10 +1,12 @@
 import pandas as pd
 
 PARAMS = dict(
-    b1=-1.67, b2=1.0, b2r=31.67, b3lo=0.0, b3hi=4.0,
-    s1=14.0, s2=5.0, s2r=77.5, s3pk=6.0, s3dp=2.33,
-    s4pr=3.5, s4r=67.5, cooldown=10,
+    b1=-2.5, b2=1.0, b2r=30.0, b3lo=0.0, b3hi=5.0,
+    s1=16.0, s2=4.0, s2r=75.0, s3pk=6.0, s3dp=2.5,
+    s4pr=4.5, s4r=67.5, cooldown=12,
 )
+
+PARAMS_VERSION = 'next_open_candidate_a'
 
 
 def close_decision(row, prev, holding, entry_price, max_dev, cooled_down,

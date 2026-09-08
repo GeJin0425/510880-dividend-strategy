@@ -1,0 +1,1756 @@
+{
+  "method": "当前next_open成交引擎 + flow_z20入口过滤；训练期稳健评分，2025+仅验证",
+  "snapshot": "tuning_results/audit/snapshot.pkl",
+  "snapshot_end": "2026-09-07",
+  "seed": 42,
+  "candidate_count": 1000,
+  "refine_top": 100,
+  "train_windows": {
+    "train_full": [
+      "2022-01-28",
+      "2024-12-31"
+    ],
+    "train_early": [
+      "2022-01-28",
+      "2023-12-31"
+    ],
+    "train_late": [
+      "2023-01-01",
+      "2024-12-31"
+    ]
+  },
+  "validation_windows": {
+    "test_2025_plus": [
+      "2025-01-01",
+      null
+    ],
+    "full_snapshot": [
+      "2022-01-28",
+      null
+    ]
+  },
+  "baseline": {
+    "params": {
+      "b1": -1.67,
+      "b2": 1.0,
+      "b2r": 31.67,
+      "b3lo": 0.0,
+      "b3hi": 4.0,
+      "s1": 14.0,
+      "s2": 5.0,
+      "s2r": 77.5,
+      "s3pk": 6.0,
+      "s3dp": 2.33,
+      "s4pr": 3.5,
+      "s4r": 67.5,
+      "cooldown": 10
+    },
+    "train": {
+      "train_full": {
+        "annualized_pct": 38.1,
+        "max_drawdown_pct": -5.8,
+        "sharpe": 2.48,
+        "win_rate_pct": 100.0,
+        "trade_count": 10,
+        "avg_win_pct": 9.3,
+        "excess_annualized_pct": 27.6,
+        "buy_hold_annualized_pct": 10.6,
+        "closed_trades": 10,
+        "holding_pct": 49.0
+      },
+      "train_early": {
+        "annualized_pct": 32.4,
+        "max_drawdown_pct": -5.8,
+        "sharpe": 2.59,
+        "win_rate_pct": 100.0,
+        "trade_count": 7,
+        "avg_win_pct": 8.0,
+        "excess_annualized_pct": 26.3,
+        "buy_hold_annualized_pct": 6.1,
+        "closed_trades": 7,
+        "holding_pct": 50.0
+      },
+      "train_late": {
+        "annualized_pct": 34.8,
+        "max_drawdown_pct": -5.3,
+        "sharpe": 2.31,
+        "win_rate_pct": 100.0,
+        "trade_count": 6,
+        "avg_win_pct": 9.6,
+        "excess_annualized_pct": 21.5,
+        "buy_hold_annualized_pct": 13.3,
+        "closed_trades": 6,
+        "holding_pct": 41.0
+      }
+    },
+    "validation": {
+      "test_2025_plus": {
+        "annualized_pct": 21.0,
+        "max_drawdown_pct": -5.7,
+        "sharpe": 1.58,
+        "win_rate_pct": 100.0,
+        "trade_count": 5,
+        "avg_win_pct": 6.7,
+        "excess_annualized_pct": 13.3,
+        "buy_hold_annualized_pct": 7.7,
+        "closed_trades": 5,
+        "holding_pct": 63.0
+      },
+      "full_snapshot": {
+        "annualized_pct": 31.7,
+        "max_drawdown_pct": -5.8,
+        "sharpe": 2.18,
+        "win_rate_pct": 100.0,
+        "trade_count": 15,
+        "avg_win_pct": 8.4,
+        "excess_annualized_pct": 22.7,
+        "buy_hold_annualized_pct": 9.0,
+        "closed_trades": 15,
+        "holding_pct": 54.0
+      }
+    },
+    "score": 31.095000000000002
+  },
+  "top_candidates": [
+    {
+      "params": {
+        "b1": -2.5,
+        "b2": 2.5,
+        "b2r": 30.0,
+        "b3hi": 5.0,
+        "s1": 10.0,
+        "s2": 5.0,
+        "s2r": 75.0,
+        "s3pk": 5.0,
+        "s3dp": 2.5,
+        "s4pr": 4.0,
+        "s4r": 67.5,
+        "cooldown": 5,
+        "b3lo": 0.0
+      },
+      "train": {
+        "train_full": {
+          "annualized_pct": 42.1,
+          "max_drawdown_pct": -5.8,
+          "sharpe": 2.73,
+          "win_rate_pct": 100.0,
+          "trade_count": 10,
+          "avg_win_pct": 9.5,
+          "excess_annualized_pct": 31.5,
+          "buy_hold_annualized_pct": 10.6,
+          "closed_trades": 10,
+          "holding_pct": 48.0
+        },
+        "train_early": {
+          "annualized_pct": 33.8,
+          "max_drawdown_pct": -5.8,
+          "sharpe": 2.69,
+          "win_rate_pct": 100.0,
+          "trade_count": 8,
+          "avg_win_pct": 7.1,
+          "excess_annualized_pct": 27.7,
+          "buy_hold_annualized_pct": 6.1,
+          "closed_trades": 8,
+          "holding_pct": 52.0
+        },
+        "train_late": {
+          "annualized_pct": 40.8,
+          "max_drawdown_pct": -5.3,
+          "sharpe": 2.66,
+          "win_rate_pct": 100.0,
+          "trade_count": 6,
+          "avg_win_pct": 9.9,
+          "excess_annualized_pct": 27.6,
+          "buy_hold_annualized_pct": 13.3,
+          "closed_trades": 6,
+          "holding_pct": 43.0
+        }
+      },
+      "validation": {
+        "test_2025_plus": {
+          "annualized_pct": 18.5,
+          "max_drawdown_pct": -6.5,
+          "sharpe": 1.41,
+          "win_rate_pct": 100.0,
+          "trade_count": 5,
+          "avg_win_pct": 5.8,
+          "excess_annualized_pct": 10.8,
+          "buy_hold_annualized_pct": 7.7,
+          "closed_trades": 5,
+          "holding_pct": 62.0
+        },
+        "full_snapshot": {
+          "annualized_pct": 32.3,
+          "max_drawdown_pct": -6.7,
+          "sharpe": 2.23,
+          "win_rate_pct": 100.0,
+          "trade_count": 16,
+          "avg_win_pct": 8.0,
+          "excess_annualized_pct": 23.3,
+          "buy_hold_annualized_pct": 9.0,
+          "closed_trades": 16,
+          "holding_pct": 55.0
+        }
+      },
+      "score": 33.885
+    },
+    {
+      "params": {
+        "b1": -2.0,
+        "b2": 1.0,
+        "b2r": 45.0,
+        "b3hi": 5.0,
+        "s1": 10.0,
+        "s2": 5.0,
+        "s2r": 75.0,
+        "s3pk": 4.0,
+        "s3dp": 3.0,
+        "s4pr": 3.5,
+        "s4r": 67.5,
+        "cooldown": 5,
+        "b3lo": 0.0
+      },
+      "train": {
+        "train_full": {
+          "annualized_pct": 41.3,
+          "max_drawdown_pct": -5.7,
+          "sharpe": 2.68,
+          "win_rate_pct": 91.0,
+          "trade_count": 11,
+          "avg_win_pct": 8.4,
+          "excess_annualized_pct": 30.7,
+          "buy_hold_annualized_pct": 10.6,
+          "closed_trades": 11,
+          "holding_pct": 49.0
+        },
+        "train_early": {
+          "annualized_pct": 33.9,
+          "max_drawdown_pct": -5.7,
+          "sharpe": 2.7,
+          "win_rate_pct": 89.0,
+          "trade_count": 9,
+          "avg_win_pct": 6.2,
+          "excess_annualized_pct": 27.8,
+          "buy_hold_annualized_pct": 6.1,
+          "closed_trades": 9,
+          "holding_pct": 54.0
+        },
+        "train_late": {
+          "annualized_pct": 39.7,
+          "max_drawdown_pct": -5.3,
+          "sharpe": 2.58,
+          "win_rate_pct": 100.0,
+          "trade_count": 6,
+          "avg_win_pct": 9.6,
+          "excess_annualized_pct": 26.4,
+          "buy_hold_annualized_pct": 13.3,
+          "closed_trades": 6,
+          "holding_pct": 43.0
+        }
+      },
+      "validation": {
+        "test_2025_plus": {
+          "annualized_pct": 17.6,
+          "max_drawdown_pct": -6.6,
+          "sharpe": 1.34,
+          "win_rate_pct": 83.0,
+          "trade_count": 6,
+          "avg_win_pct": 4.7,
+          "excess_annualized_pct": 9.9,
+          "buy_hold_annualized_pct": 7.7,
+          "closed_trades": 6,
+          "holding_pct": 63.0
+        },
+        "full_snapshot": {
+          "annualized_pct": 31.2,
+          "max_drawdown_pct": -6.6,
+          "sharpe": 2.15,
+          "win_rate_pct": 89.0,
+          "trade_count": 18,
+          "avg_win_pct": 6.8,
+          "excess_annualized_pct": 22.2,
+          "buy_hold_annualized_pct": 9.0,
+          "closed_trades": 18,
+          "holding_pct": 57.0
+        }
+      },
+      "score": 33.52000000000001
+    },
+    {
+      "params": {
+        "b1": -1.67,
+        "b2": 2.0,
+        "b2r": 30.0,
+        "b3hi": 4.0,
+        "s1": 16.0,
+        "s2": 7.0,
+        "s2r": 70.0,
+        "s3pk": 4.0,
+        "s3dp": 2.5,
+        "s4pr": 5.0,
+        "s4r": 67.5,
+        "cooldown": 8,
+        "b3lo": 0.0
+      },
+      "train": {
+        "train_full": {
+          "annualized_pct": 41.1,
+          "max_drawdown_pct": -5.3,
+          "sharpe": 2.76,
+          "win_rate_pct": 100.0,
+          "trade_count": 10,
+          "avg_win_pct": 9.2,
+          "excess_annualized_pct": 30.5,
+          "buy_hold_annualized_pct": 10.6,
+          "closed_trades": 10,
+          "holding_pct": 42.0
+        },
+        "train_early": {
+          "annualized_pct": 34.5,
+          "max_drawdown_pct": -3.7,
+          "sharpe": 2.97,
+          "win_rate_pct": 100.0,
+          "trade_count": 8,
+          "avg_win_pct": 7.1,
+          "excess_annualized_pct": 28.4,
+          "buy_hold_annualized_pct": 6.1,
+          "closed_trades": 8,
+          "holding_pct": 43.0
+        },
+        "train_late": {
+          "annualized_pct": 34.7,
+          "max_drawdown_pct": -5.3,
+          "sharpe": 2.36,
+          "win_rate_pct": 100.0,
+          "trade_count": 5,
+          "avg_win_pct": 10.1,
+          "excess_annualized_pct": 21.4,
+          "buy_hold_annualized_pct": 13.3,
+          "closed_trades": 5,
+          "holding_pct": 35.0
+        }
+      },
+      "validation": {
+        "test_2025_plus": {
+          "annualized_pct": 18.1,
+          "max_drawdown_pct": -5.7,
+          "sharpe": 1.47,
+          "win_rate_pct": 100.0,
+          "trade_count": 6,
+          "avg_win_pct": 4.7,
+          "excess_annualized_pct": 10.4,
+          "buy_hold_annualized_pct": 7.7,
+          "closed_trades": 6,
+          "holding_pct": 57.0
+        },
+        "full_snapshot": {
+          "annualized_pct": 31.6,
+          "max_drawdown_pct": -6.7,
+          "sharpe": 2.27,
+          "win_rate_pct": 100.0,
+          "trade_count": 17,
+          "avg_win_pct": 7.2,
+          "excess_annualized_pct": 22.6,
+          "buy_hold_annualized_pct": 9.0,
+          "closed_trades": 17,
+          "holding_pct": 50.0
+        }
+      },
+      "score": 32.89166666666667
+    },
+    {
+      "params": {
+        "b1": -1.5,
+        "b2": 2.5,
+        "b2r": 30.0,
+        "b3hi": 5.0,
+        "s1": 16.0,
+        "s2": 6.0,
+        "s2r": 70.0,
+        "s3pk": 4.0,
+        "s3dp": 3.0,
+        "s4pr": 4.5,
+        "s4r": 67.5,
+        "cooldown": 5,
+        "b3lo": 0.0
+      },
+      "train": {
+        "train_full": {
+          "annualized_pct": 40.5,
+          "max_drawdown_pct": -5.3,
+          "sharpe": 2.68,
+          "win_rate_pct": 91.0,
+          "trade_count": 11,
+          "avg_win_pct": 8.2,
+          "excess_annualized_pct": 30.0,
+          "buy_hold_annualized_pct": 10.6,
+          "closed_trades": 11,
+          "holding_pct": 48.0
+        },
+        "train_early": {
+          "annualized_pct": 34.4,
+          "max_drawdown_pct": -3.8,
+          "sharpe": 2.84,
+          "win_rate_pct": 89.0,
+          "trade_count": 9,
+          "avg_win_pct": 6.2,
+          "excess_annualized_pct": 28.3,
+          "buy_hold_annualized_pct": 6.1,
+          "closed_trades": 9,
+          "holding_pct": 51.0
+        },
+        "train_late": {
+          "annualized_pct": 35.6,
+          "max_drawdown_pct": -5.3,
+          "sharpe": 2.37,
+          "win_rate_pct": 100.0,
+          "trade_count": 6,
+          "avg_win_pct": 8.4,
+          "excess_annualized_pct": 22.3,
+          "buy_hold_annualized_pct": 13.3,
+          "closed_trades": 6,
+          "holding_pct": 42.0
+        }
+      },
+      "validation": {
+        "test_2025_plus": {
+          "annualized_pct": 18.6,
+          "max_drawdown_pct": -6.6,
+          "sharpe": 1.44,
+          "win_rate_pct": 83.0,
+          "trade_count": 6,
+          "avg_win_pct": 5.0,
+          "excess_annualized_pct": 10.9,
+          "buy_hold_annualized_pct": 7.7,
+          "closed_trades": 6,
+          "holding_pct": 61.0
+        },
+        "full_snapshot": {
+          "annualized_pct": 31.1,
+          "max_drawdown_pct": -7.8,
+          "sharpe": 2.18,
+          "win_rate_pct": 89.0,
+          "trade_count": 18,
+          "avg_win_pct": 6.8,
+          "excess_annualized_pct": 22.1,
+          "buy_hold_annualized_pct": 9.0,
+          "closed_trades": 18,
+          "holding_pct": 55.0
+        }
+      },
+      "score": 32.803333333333335
+    },
+    {
+      "params": {
+        "b1": -2.0,
+        "b2": 1.0,
+        "b2r": 30.0,
+        "b3hi": 5.0,
+        "s1": 14.0,
+        "s2": 6.0,
+        "s2r": 77.5,
+        "s3pk": 5.0,
+        "s3dp": 3.0,
+        "s4pr": 3.5,
+        "s4r": 67.5,
+        "cooldown": 5,
+        "b3lo": 0.0
+      },
+      "train": {
+        "train_full": {
+          "annualized_pct": 39.9,
+          "max_drawdown_pct": -5.8,
+          "sharpe": 2.55,
+          "win_rate_pct": 90.0,
+          "trade_count": 10,
+          "avg_win_pct": 9.1,
+          "excess_annualized_pct": 29.3,
+          "buy_hold_annualized_pct": 10.6,
+          "closed_trades": 10,
+          "holding_pct": 52.0
+        },
+        "train_early": {
+          "annualized_pct": 33.0,
+          "max_drawdown_pct": -5.8,
+          "sharpe": 2.56,
+          "win_rate_pct": 88.0,
+          "trade_count": 8,
+          "avg_win_pct": 7.0,
+          "excess_annualized_pct": 26.9,
+          "buy_hold_annualized_pct": 6.1,
+          "closed_trades": 8,
+          "holding_pct": 57.0
+        },
+        "train_late": {
+          "annualized_pct": 37.8,
+          "max_drawdown_pct": -5.3,
+          "sharpe": 2.44,
+          "win_rate_pct": 100.0,
+          "trade_count": 6,
+          "avg_win_pct": 9.2,
+          "excess_annualized_pct": 24.6,
+          "buy_hold_annualized_pct": 13.3,
+          "closed_trades": 6,
+          "holding_pct": 45.0
+        }
+      },
+      "validation": {
+        "test_2025_plus": {
+          "annualized_pct": 19.2,
+          "max_drawdown_pct": -6.6,
+          "sharpe": 1.42,
+          "win_rate_pct": 80.0,
+          "trade_count": 5,
+          "avg_win_pct": 6.2,
+          "excess_annualized_pct": 11.5,
+          "buy_hold_annualized_pct": 7.7,
+          "closed_trades": 5,
+          "holding_pct": 66.0
+        },
+        "full_snapshot": {
+          "annualized_pct": 30.9,
+          "max_drawdown_pct": -7.8,
+          "sharpe": 2.09,
+          "win_rate_pct": 88.0,
+          "trade_count": 16,
+          "avg_win_pct": 7.7,
+          "excess_annualized_pct": 22.0,
+          "buy_hold_annualized_pct": 9.0,
+          "closed_trades": 16,
+          "holding_pct": 59.0
+        }
+      },
+      "score": 32.32
+    },
+    {
+      "params": {
+        "b1": -1.67,
+        "b2": 1.5,
+        "b2r": 30.0,
+        "b3hi": 5.0,
+        "s1": 10.0,
+        "s2": 4.0,
+        "s2r": 75.0,
+        "s3pk": 5.0,
+        "s3dp": 2.33,
+        "s4pr": 3.5,
+        "s4r": 65.0,
+        "cooldown": 10,
+        "b3lo": 0.0
+      },
+      "train": {
+        "train_full": {
+          "annualized_pct": 40.1,
+          "max_drawdown_pct": -6.3,
+          "sharpe": 2.62,
+          "win_rate_pct": 91.0,
+          "trade_count": 11,
+          "avg_win_pct": 8.6,
+          "excess_annualized_pct": 29.5,
+          "buy_hold_annualized_pct": 10.6,
+          "closed_trades": 11,
+          "holding_pct": 50.0
+        },
+        "train_early": {
+          "annualized_pct": 32.3,
+          "max_drawdown_pct": -5.8,
+          "sharpe": 2.56,
+          "win_rate_pct": 88.0,
+          "trade_count": 8,
+          "avg_win_pct": 7.0,
+          "excess_annualized_pct": 26.2,
+          "buy_hold_annualized_pct": 6.1,
+          "closed_trades": 8,
+          "holding_pct": 54.0
+        },
+        "train_late": {
+          "annualized_pct": 38.6,
+          "max_drawdown_pct": -6.3,
+          "sharpe": 2.55,
+          "win_rate_pct": 100.0,
+          "trade_count": 7,
+          "avg_win_pct": 8.5,
+          "excess_annualized_pct": 25.4,
+          "buy_hold_annualized_pct": 13.3,
+          "closed_trades": 7,
+          "holding_pct": 44.0
+        }
+      },
+      "validation": {
+        "test_2025_plus": {
+          "annualized_pct": 16.3,
+          "max_drawdown_pct": -5.7,
+          "sharpe": 1.39,
+          "win_rate_pct": 100.0,
+          "trade_count": 5,
+          "avg_win_pct": 5.0,
+          "excess_annualized_pct": 8.6,
+          "buy_hold_annualized_pct": 7.7,
+          "closed_trades": 5,
+          "holding_pct": 56.0
+        },
+        "full_snapshot": {
+          "annualized_pct": 31.0,
+          "max_drawdown_pct": -6.3,
+          "sharpe": 2.23,
+          "win_rate_pct": 94.0,
+          "trade_count": 16,
+          "avg_win_pct": 7.5,
+          "excess_annualized_pct": 22.0,
+          "buy_hold_annualized_pct": 9.0,
+          "closed_trades": 16,
+          "holding_pct": 52.0
+        }
+      },
+      "score": 32.29
+    },
+    {
+      "params": {
+        "b1": -2.0,
+        "b2": 2.5,
+        "b2r": 30.0,
+        "b3hi": 5.0,
+        "s1": 10.0,
+        "s2": 7.0,
+        "s2r": 70.0,
+        "s3pk": 6.0,
+        "s3dp": 2.5,
+        "s4pr": 4.5,
+        "s4r": 65.0,
+        "cooldown": 5,
+        "b3lo": 0.0
+      },
+      "train": {
+        "train_full": {
+          "annualized_pct": 39.2,
+          "max_drawdown_pct": -5.8,
+          "sharpe": 2.56,
+          "win_rate_pct": 100.0,
+          "trade_count": 10,
+          "avg_win_pct": 8.8,
+          "excess_annualized_pct": 28.6,
+          "buy_hold_annualized_pct": 10.6,
+          "closed_trades": 10,
+          "holding_pct": 49.0
+        },
+        "train_early": {
+          "annualized_pct": 31.8,
+          "max_drawdown_pct": -5.8,
+          "sharpe": 2.53,
+          "win_rate_pct": 100.0,
+          "trade_count": 8,
+          "avg_win_pct": 6.7,
+          "excess_annualized_pct": 25.7,
+          "buy_hold_annualized_pct": 6.1,
+          "closed_trades": 8,
+          "holding_pct": 54.0
+        },
+        "train_late": {
+          "annualized_pct": 35.9,
+          "max_drawdown_pct": -5.3,
+          "sharpe": 2.38,
+          "win_rate_pct": 100.0,
+          "trade_count": 5,
+          "avg_win_pct": 10.4,
+          "excess_annualized_pct": 22.7,
+          "buy_hold_annualized_pct": 13.3,
+          "closed_trades": 5,
+          "holding_pct": 44.0
+        }
+      },
+      "validation": {
+        "test_2025_plus": {
+          "annualized_pct": 22.9,
+          "max_drawdown_pct": -6.5,
+          "sharpe": 1.73,
+          "win_rate_pct": 100.0,
+          "trade_count": 5,
+          "avg_win_pct": 7.2,
+          "excess_annualized_pct": 15.2,
+          "buy_hold_annualized_pct": 7.7,
+          "closed_trades": 5,
+          "holding_pct": 64.0
+        },
+        "full_snapshot": {
+          "annualized_pct": 32.3,
+          "max_drawdown_pct": -6.7,
+          "sharpe": 2.22,
+          "win_rate_pct": 100.0,
+          "trade_count": 16,
+          "avg_win_pct": 7.9,
+          "excess_annualized_pct": 23.3,
+          "buy_hold_annualized_pct": 9.0,
+          "closed_trades": 16,
+          "holding_pct": 57.0
+        }
+      },
+      "score": 31.283333333333335
+    },
+    {
+      "params": {
+        "b1": -2.0,
+        "b2": 2.0,
+        "b2r": 30.0,
+        "b3hi": 6.0,
+        "s1": 10.0,
+        "s2": 4.0,
+        "s2r": 77.5,
+        "s3pk": 4.0,
+        "s3dp": 2.5,
+        "s4pr": 3.5,
+        "s4r": 70.0,
+        "cooldown": 5,
+        "b3lo": 0.0
+      },
+      "train": {
+        "train_full": {
+          "annualized_pct": 39.1,
+          "max_drawdown_pct": -6.2,
+          "sharpe": 2.49,
+          "win_rate_pct": 85.0,
+          "trade_count": 13,
+          "avg_win_pct": 6.8,
+          "excess_annualized_pct": 28.6,
+          "buy_hold_annualized_pct": 10.6,
+          "closed_trades": 13,
+          "holding_pct": 51.0
+        },
+        "train_early": {
+          "annualized_pct": 31.0,
+          "max_drawdown_pct": -6.2,
+          "sharpe": 2.39,
+          "win_rate_pct": 90.0,
+          "trade_count": 10,
+          "avg_win_pct": 5.2,
+          "excess_annualized_pct": 24.9,
+          "buy_hold_annualized_pct": 6.1,
+          "closed_trades": 10,
+          "holding_pct": 56.0
+        },
+        "train_late": {
+          "annualized_pct": 38.2,
+          "max_drawdown_pct": -5.4,
+          "sharpe": 2.44,
+          "win_rate_pct": 75.0,
+          "trade_count": 8,
+          "avg_win_pct": 7.2,
+          "excess_annualized_pct": 25.0,
+          "buy_hold_annualized_pct": 13.3,
+          "closed_trades": 8,
+          "holding_pct": 46.0
+        }
+      },
+      "validation": {
+        "test_2025_plus": {
+          "annualized_pct": 15.4,
+          "max_drawdown_pct": -6.5,
+          "sharpe": 1.17,
+          "win_rate_pct": 88.0,
+          "trade_count": 8,
+          "avg_win_pct": 3.1,
+          "excess_annualized_pct": 7.8,
+          "buy_hold_annualized_pct": 7.7,
+          "closed_trades": 8,
+          "holding_pct": 66.0
+        },
+        "full_snapshot": {
+          "annualized_pct": 29.3,
+          "max_drawdown_pct": -6.7,
+          "sharpe": 1.99,
+          "win_rate_pct": 86.0,
+          "trade_count": 22,
+          "avg_win_pct": 5.3,
+          "excess_annualized_pct": 20.3,
+          "buy_hold_annualized_pct": 9.0,
+          "closed_trades": 22,
+          "holding_pct": 59.0
+        }
+      },
+      "score": 31.265000000000004
+    },
+    {
+      "params": {
+        "b1": -2.0,
+        "b2": 1.5,
+        "b2r": 40.0,
+        "b3hi": 5.0,
+        "s1": 14.0,
+        "s2": 5.0,
+        "s2r": 75.0,
+        "s3pk": 5.0,
+        "s3dp": 3.0,
+        "s4pr": 4.0,
+        "s4r": 67.5,
+        "cooldown": 8,
+        "b3lo": 0.0
+      },
+      "train": {
+        "train_full": {
+          "annualized_pct": 39.1,
+          "max_drawdown_pct": -6.1,
+          "sharpe": 2.51,
+          "win_rate_pct": 90.0,
+          "trade_count": 10,
+          "avg_win_pct": 8.8,
+          "excess_annualized_pct": 28.5,
+          "buy_hold_annualized_pct": 10.6,
+          "closed_trades": 10,
+          "holding_pct": 51.0
+        },
+        "train_early": {
+          "annualized_pct": 30.6,
+          "max_drawdown_pct": -5.8,
+          "sharpe": 2.37,
+          "win_rate_pct": 88.0,
+          "trade_count": 8,
+          "avg_win_pct": 6.7,
+          "excess_annualized_pct": 24.5,
+          "buy_hold_annualized_pct": 6.1,
+          "closed_trades": 8,
+          "holding_pct": 57.0
+        },
+        "train_late": {
+          "annualized_pct": 38.8,
+          "max_drawdown_pct": -6.1,
+          "sharpe": 2.53,
+          "win_rate_pct": 100.0,
+          "trade_count": 6,
+          "avg_win_pct": 9.3,
+          "excess_annualized_pct": 25.6,
+          "buy_hold_annualized_pct": 13.3,
+          "closed_trades": 6,
+          "holding_pct": 42.0
+        }
+      },
+      "validation": {
+        "test_2025_plus": {
+          "annualized_pct": 22.5,
+          "max_drawdown_pct": -5.7,
+          "sharpe": 1.67,
+          "win_rate_pct": 100.0,
+          "trade_count": 5,
+          "avg_win_pct": 7.3,
+          "excess_annualized_pct": 14.8,
+          "buy_hold_annualized_pct": 7.7,
+          "closed_trades": 5,
+          "holding_pct": 65.0
+        },
+        "full_snapshot": {
+          "annualized_pct": 32.2,
+          "max_drawdown_pct": -7.8,
+          "sharpe": 2.18,
+          "win_rate_pct": 94.0,
+          "trade_count": 16,
+          "avg_win_pct": 8.0,
+          "excess_annualized_pct": 23.2,
+          "buy_hold_annualized_pct": 9.0,
+          "closed_trades": 16,
+          "holding_pct": 58.0
+        }
+      },
+      "score": 31.246666666666663
+    },
+    {
+      "params": {
+        "b1": -1.67,
+        "b2": 1.0,
+        "b2r": 31.67,
+        "b3lo": 0.0,
+        "b3hi": 4.0,
+        "s1": 14.0,
+        "s2": 5.0,
+        "s2r": 77.5,
+        "s3pk": 6.0,
+        "s3dp": 2.33,
+        "s4pr": 3.5,
+        "s4r": 67.5,
+        "cooldown": 10
+      },
+      "train": {
+        "train_full": {
+          "annualized_pct": 38.1,
+          "max_drawdown_pct": -5.8,
+          "sharpe": 2.48,
+          "win_rate_pct": 100.0,
+          "trade_count": 10,
+          "avg_win_pct": 9.3,
+          "excess_annualized_pct": 27.6,
+          "buy_hold_annualized_pct": 10.6,
+          "closed_trades": 10,
+          "holding_pct": 49.0
+        },
+        "train_early": {
+          "annualized_pct": 32.4,
+          "max_drawdown_pct": -5.8,
+          "sharpe": 2.59,
+          "win_rate_pct": 100.0,
+          "trade_count": 7,
+          "avg_win_pct": 8.0,
+          "excess_annualized_pct": 26.3,
+          "buy_hold_annualized_pct": 6.1,
+          "closed_trades": 7,
+          "holding_pct": 50.0
+        },
+        "train_late": {
+          "annualized_pct": 34.8,
+          "max_drawdown_pct": -5.3,
+          "sharpe": 2.31,
+          "win_rate_pct": 100.0,
+          "trade_count": 6,
+          "avg_win_pct": 9.6,
+          "excess_annualized_pct": 21.5,
+          "buy_hold_annualized_pct": 13.3,
+          "closed_trades": 6,
+          "holding_pct": 41.0
+        }
+      },
+      "validation": {
+        "test_2025_plus": {
+          "annualized_pct": 21.0,
+          "max_drawdown_pct": -5.7,
+          "sharpe": 1.58,
+          "win_rate_pct": 100.0,
+          "trade_count": 5,
+          "avg_win_pct": 6.7,
+          "excess_annualized_pct": 13.3,
+          "buy_hold_annualized_pct": 7.7,
+          "closed_trades": 5,
+          "holding_pct": 63.0
+        },
+        "full_snapshot": {
+          "annualized_pct": 31.7,
+          "max_drawdown_pct": -5.8,
+          "sharpe": 2.18,
+          "win_rate_pct": 100.0,
+          "trade_count": 15,
+          "avg_win_pct": 8.4,
+          "excess_annualized_pct": 22.7,
+          "buy_hold_annualized_pct": 9.0,
+          "closed_trades": 15,
+          "holding_pct": 54.0
+        }
+      },
+      "score": 31.095000000000002
+    },
+    {
+      "params": {
+        "b1": -2.0,
+        "b2": 2.5,
+        "b2r": 30.0,
+        "b3hi": 5.0,
+        "s1": 12.0,
+        "s2": 6.0,
+        "s2r": 70.0,
+        "s3pk": 6.0,
+        "s3dp": 2.33,
+        "s4pr": 3.0,
+        "s4r": 67.5,
+        "cooldown": 8,
+        "b3lo": 0.0
+      },
+      "train": {
+        "train_full": {
+          "annualized_pct": 38.3,
+          "max_drawdown_pct": -5.8,
+          "sharpe": 2.52,
+          "win_rate_pct": 100.0,
+          "trade_count": 11,
+          "avg_win_pct": 8.3,
+          "excess_annualized_pct": 27.7,
+          "buy_hold_annualized_pct": 10.6,
+          "closed_trades": 11,
+          "holding_pct": 51.0
+        },
+        "train_early": {
+          "annualized_pct": 32.5,
+          "max_drawdown_pct": -5.8,
+          "sharpe": 2.59,
+          "win_rate_pct": 100.0,
+          "trade_count": 8,
+          "avg_win_pct": 6.8,
+          "excess_annualized_pct": 26.4,
+          "buy_hold_annualized_pct": 6.1,
+          "closed_trades": 8,
+          "holding_pct": 53.0
+        },
+        "train_late": {
+          "annualized_pct": 34.1,
+          "max_drawdown_pct": -5.3,
+          "sharpe": 2.3,
+          "win_rate_pct": 100.0,
+          "trade_count": 7,
+          "avg_win_pct": 7.7,
+          "excess_annualized_pct": 20.8,
+          "buy_hold_annualized_pct": 13.3,
+          "closed_trades": 7,
+          "holding_pct": 44.0
+        }
+      },
+      "validation": {
+        "test_2025_plus": {
+          "annualized_pct": 22.1,
+          "max_drawdown_pct": -5.7,
+          "sharpe": 1.69,
+          "win_rate_pct": 100.0,
+          "trade_count": 5,
+          "avg_win_pct": 7.0,
+          "excess_annualized_pct": 14.4,
+          "buy_hold_annualized_pct": 7.7,
+          "closed_trades": 5,
+          "holding_pct": 62.0
+        },
+        "full_snapshot": {
+          "annualized_pct": 32.2,
+          "max_drawdown_pct": -5.9,
+          "sharpe": 2.24,
+          "win_rate_pct": 100.0,
+          "trade_count": 16,
+          "avg_win_pct": 7.9,
+          "excess_annualized_pct": 23.2,
+          "buy_hold_annualized_pct": 9.0,
+          "closed_trades": 16,
+          "holding_pct": 55.0
+        }
+      },
+      "score": 31.061666666666667
+    },
+    {
+      "params": {
+        "b1": -1.67,
+        "b2": 1.5,
+        "b2r": 35.0,
+        "b3hi": 5.0,
+        "s1": 10.0,
+        "s2": 4.0,
+        "s2r": 85.0,
+        "s3pk": 6.0,
+        "s3dp": 2.5,
+        "s4pr": 5.0,
+        "s4r": 67.5,
+        "cooldown": 10,
+        "b3lo": 0.0
+      },
+      "train": {
+        "train_full": {
+          "annualized_pct": 40.1,
+          "max_drawdown_pct": -6.3,
+          "sharpe": 2.57,
+          "win_rate_pct": 100.0,
+          "trade_count": 10,
+          "avg_win_pct": 9.1,
+          "excess_annualized_pct": 29.5,
+          "buy_hold_annualized_pct": 10.6,
+          "closed_trades": 10,
+          "holding_pct": 51.0
+        },
+        "train_early": {
+          "annualized_pct": 31.0,
+          "max_drawdown_pct": -5.8,
+          "sharpe": 2.4,
+          "win_rate_pct": 100.0,
+          "trade_count": 8,
+          "avg_win_pct": 6.8,
+          "excess_annualized_pct": 24.9,
+          "buy_hold_annualized_pct": 6.1,
+          "closed_trades": 8,
+          "holding_pct": 57.0
+        },
+        "train_late": {
+          "annualized_pct": 35.1,
+          "max_drawdown_pct": -6.3,
+          "sharpe": 2.31,
+          "win_rate_pct": 100.0,
+          "trade_count": 5,
+          "avg_win_pct": 10.2,
+          "excess_annualized_pct": 21.8,
+          "buy_hold_annualized_pct": 13.3,
+          "closed_trades": 5,
+          "holding_pct": 44.0
+        }
+      },
+      "validation": {
+        "test_2025_plus": {
+          "annualized_pct": 20.9,
+          "max_drawdown_pct": -5.7,
+          "sharpe": 1.58,
+          "win_rate_pct": 100.0,
+          "trade_count": 5,
+          "avg_win_pct": 6.8,
+          "excess_annualized_pct": 13.3,
+          "buy_hold_annualized_pct": 7.7,
+          "closed_trades": 5,
+          "holding_pct": 65.0
+        },
+        "full_snapshot": {
+          "annualized_pct": 32.3,
+          "max_drawdown_pct": -6.5,
+          "sharpe": 2.19,
+          "win_rate_pct": 100.0,
+          "trade_count": 16,
+          "avg_win_pct": 8.1,
+          "excess_annualized_pct": 23.3,
+          "buy_hold_annualized_pct": 9.0,
+          "closed_trades": 16,
+          "holding_pct": 59.0
+        }
+      },
+      "score": 30.860000000000003
+    },
+    {
+      "params": {
+        "b1": -1.5,
+        "b2": 1.5,
+        "b2r": 30.0,
+        "b3hi": 5.0,
+        "s1": 14.0,
+        "s2": 4.0,
+        "s2r": 80.0,
+        "s3pk": 5.0,
+        "s3dp": 1.5,
+        "s4pr": 5.0,
+        "s4r": 67.5,
+        "cooldown": 15,
+        "b3lo": 0.0
+      },
+      "train": {
+        "train_full": {
+          "annualized_pct": 37.8,
+          "max_drawdown_pct": -5.8,
+          "sharpe": 2.5,
+          "win_rate_pct": 100.0,
+          "trade_count": 11,
+          "avg_win_pct": 8.3,
+          "excess_annualized_pct": 27.2,
+          "buy_hold_annualized_pct": 10.6,
+          "closed_trades": 11,
+          "holding_pct": 50.0
+        },
+        "train_early": {
+          "annualized_pct": 32.5,
+          "max_drawdown_pct": -5.8,
+          "sharpe": 2.72,
+          "win_rate_pct": 100.0,
+          "trade_count": 8,
+          "avg_win_pct": 7.0,
+          "excess_annualized_pct": 26.4,
+          "buy_hold_annualized_pct": 6.1,
+          "closed_trades": 8,
+          "holding_pct": 51.0
+        },
+        "train_late": {
+          "annualized_pct": 33.4,
+          "max_drawdown_pct": -5.3,
+          "sharpe": 2.22,
+          "win_rate_pct": 100.0,
+          "trade_count": 7,
+          "avg_win_pct": 7.7,
+          "excess_annualized_pct": 20.2,
+          "buy_hold_annualized_pct": 13.3,
+          "closed_trades": 7,
+          "holding_pct": 45.0
+        }
+      },
+      "validation": {
+        "test_2025_plus": {
+          "annualized_pct": 14.1,
+          "max_drawdown_pct": -5.7,
+          "sharpe": 1.13,
+          "win_rate_pct": 100.0,
+          "trade_count": 5,
+          "avg_win_pct": 4.4,
+          "excess_annualized_pct": 6.4,
+          "buy_hold_annualized_pct": 7.7,
+          "closed_trades": 5,
+          "holding_pct": 59.0
+        },
+        "full_snapshot": {
+          "annualized_pct": 28.7,
+          "max_drawdown_pct": -5.9,
+          "sharpe": 2.06,
+          "win_rate_pct": 100.0,
+          "trade_count": 16,
+          "avg_win_pct": 7.1,
+          "excess_annualized_pct": 19.7,
+          "buy_hold_annualized_pct": 9.0,
+          "closed_trades": 16,
+          "holding_pct": 53.0
+        }
+      },
+      "score": 30.856666666666666
+    },
+    {
+      "params": {
+        "b1": -1.5,
+        "b2": 0.5,
+        "b2r": 31.67,
+        "b3hi": 4.0,
+        "s1": 12.0,
+        "s2": 6.0,
+        "s2r": 80.0,
+        "s3pk": 4.0,
+        "s3dp": 3.0,
+        "s4pr": 5.0,
+        "s4r": 67.5,
+        "cooldown": 8,
+        "b3lo": 0.0
+      },
+      "train": {
+        "train_full": {
+          "annualized_pct": 39.8,
+          "max_drawdown_pct": -5.6,
+          "sharpe": 2.62,
+          "win_rate_pct": 90.0,
+          "trade_count": 10,
+          "avg_win_pct": 9.0,
+          "excess_annualized_pct": 29.3,
+          "buy_hold_annualized_pct": 10.6,
+          "closed_trades": 10,
+          "holding_pct": 45.0
+        },
+        "train_early": {
+          "annualized_pct": 33.5,
+          "max_drawdown_pct": -4.4,
+          "sharpe": 2.79,
+          "win_rate_pct": 88.0,
+          "trade_count": 8,
+          "avg_win_pct": 7.2,
+          "excess_annualized_pct": 27.4,
+          "buy_hold_annualized_pct": 6.1,
+          "closed_trades": 8,
+          "holding_pct": 47.0
+        },
+        "train_late": {
+          "annualized_pct": 31.5,
+          "max_drawdown_pct": -5.6,
+          "sharpe": 2.11,
+          "win_rate_pct": 100.0,
+          "trade_count": 4,
+          "avg_win_pct": 11.5,
+          "excess_annualized_pct": 18.2,
+          "buy_hold_annualized_pct": 13.3,
+          "closed_trades": 4,
+          "holding_pct": 39.0
+        }
+      },
+      "validation": {
+        "test_2025_plus": {
+          "annualized_pct": 18.0,
+          "max_drawdown_pct": -5.7,
+          "sharpe": 1.37,
+          "win_rate_pct": 83.0,
+          "trade_count": 6,
+          "avg_win_pct": 4.8,
+          "excess_annualized_pct": 10.3,
+          "buy_hold_annualized_pct": 7.7,
+          "closed_trades": 6,
+          "holding_pct": 62.0
+        },
+        "full_snapshot": {
+          "annualized_pct": 30.4,
+          "max_drawdown_pct": -7.8,
+          "sharpe": 2.11,
+          "win_rate_pct": 88.0,
+          "trade_count": 17,
+          "avg_win_pct": 7.1,
+          "excess_annualized_pct": 21.4,
+          "buy_hold_annualized_pct": 9.0,
+          "closed_trades": 17,
+          "holding_pct": 54.0
+        }
+      },
+      "score": 30.848333333333336
+    },
+    {
+      "params": {
+        "b1": -2.5,
+        "b2": 2.5,
+        "b2r": 28.0,
+        "b3hi": 5.0,
+        "s1": 16.0,
+        "s2": 4.0,
+        "s2r": 77.5,
+        "s3pk": 5.0,
+        "s3dp": 2.5,
+        "s4pr": 4.0,
+        "s4r": 67.5,
+        "cooldown": 12,
+        "b3lo": 0.0
+      },
+      "train": {
+        "train_full": {
+          "annualized_pct": 39.0,
+          "max_drawdown_pct": -6.2,
+          "sharpe": 2.54,
+          "win_rate_pct": 100.0,
+          "trade_count": 10,
+          "avg_win_pct": 8.9,
+          "excess_annualized_pct": 28.4,
+          "buy_hold_annualized_pct": 10.6,
+          "closed_trades": 10,
+          "holding_pct": 48.0
+        },
+        "train_early": {
+          "annualized_pct": 30.6,
+          "max_drawdown_pct": -5.8,
+          "sharpe": 2.47,
+          "win_rate_pct": 100.0,
+          "trade_count": 8,
+          "avg_win_pct": 6.7,
+          "excess_annualized_pct": 24.5,
+          "buy_hold_annualized_pct": 6.1,
+          "closed_trades": 8,
+          "holding_pct": 52.0
+        },
+        "train_late": {
+          "annualized_pct": 36.2,
+          "max_drawdown_pct": -6.2,
+          "sharpe": 2.37,
+          "win_rate_pct": 100.0,
+          "trade_count": 6,
+          "avg_win_pct": 8.9,
+          "excess_annualized_pct": 23.0,
+          "buy_hold_annualized_pct": 13.3,
+          "closed_trades": 6,
+          "holding_pct": 43.0
+        }
+      },
+      "validation": {
+        "test_2025_plus": {
+          "annualized_pct": 17.0,
+          "max_drawdown_pct": -5.7,
+          "sharpe": 1.32,
+          "win_rate_pct": 100.0,
+          "trade_count": 5,
+          "avg_win_pct": 5.5,
+          "excess_annualized_pct": 9.4,
+          "buy_hold_annualized_pct": 7.7,
+          "closed_trades": 5,
+          "holding_pct": 61.0
+        },
+        "full_snapshot": {
+          "annualized_pct": 30.0,
+          "max_drawdown_pct": -6.2,
+          "sharpe": 2.09,
+          "win_rate_pct": 100.0,
+          "trade_count": 16,
+          "avg_win_pct": 7.5,
+          "excess_annualized_pct": 21.0,
+          "buy_hold_annualized_pct": 9.0,
+          "closed_trades": 16,
+          "holding_pct": 54.0
+        }
+      },
+      "score": 30.736666666666675
+    },
+    {
+      "params": {
+        "b1": -1.67,
+        "b2": 2.0,
+        "b2r": 35.0,
+        "b3hi": 6.0,
+        "s1": 12.0,
+        "s2": 6.0,
+        "s2r": 75.0,
+        "s3pk": 6.0,
+        "s3dp": 2.5,
+        "s4pr": 4.0,
+        "s4r": 67.5,
+        "cooldown": 5,
+        "b3lo": 0.0
+      },
+      "train": {
+        "train_full": {
+          "annualized_pct": 38.3,
+          "max_drawdown_pct": -5.8,
+          "sharpe": 2.44,
+          "win_rate_pct": 83.0,
+          "trade_count": 12,
+          "avg_win_pct": 7.4,
+          "excess_annualized_pct": 27.8,
+          "buy_hold_annualized_pct": 10.6,
+          "closed_trades": 12,
+          "holding_pct": 53.0
+        },
+        "train_early": {
+          "annualized_pct": 30.9,
+          "max_drawdown_pct": -5.8,
+          "sharpe": 2.36,
+          "win_rate_pct": 89.0,
+          "trade_count": 9,
+          "avg_win_pct": 6.0,
+          "excess_annualized_pct": 24.8,
+          "buy_hold_annualized_pct": 6.1,
+          "closed_trades": 9,
+          "holding_pct": 58.0
+        },
+        "train_late": {
+          "annualized_pct": 36.5,
+          "max_drawdown_pct": -5.3,
+          "sharpe": 2.34,
+          "win_rate_pct": 75.0,
+          "trade_count": 8,
+          "avg_win_pct": 6.8,
+          "excess_annualized_pct": 23.2,
+          "buy_hold_annualized_pct": 13.3,
+          "closed_trades": 8,
+          "holding_pct": 46.0
+        }
+      },
+      "validation": {
+        "test_2025_plus": {
+          "annualized_pct": 19.1,
+          "max_drawdown_pct": -6.8,
+          "sharpe": 1.38,
+          "win_rate_pct": 86.0,
+          "trade_count": 7,
+          "avg_win_pct": 4.5,
+          "excess_annualized_pct": 11.4,
+          "buy_hold_annualized_pct": 7.7,
+          "closed_trades": 7,
+          "holding_pct": 71.0
+        },
+        "full_snapshot": {
+          "annualized_pct": 30.2,
+          "max_drawdown_pct": -6.9,
+          "sharpe": 2.02,
+          "win_rate_pct": 85.0,
+          "trade_count": 20,
+          "avg_win_pct": 6.2,
+          "excess_annualized_pct": 21.2,
+          "buy_hold_annualized_pct": 9.0,
+          "closed_trades": 20,
+          "holding_pct": 62.0
+        }
+      },
+      "score": 30.673333333333332
+    },
+    {
+      "params": {
+        "b1": -0.5,
+        "b2": 2.0,
+        "b2r": 30.0,
+        "b3hi": 5.0,
+        "s1": 10.0,
+        "s2": 7.0,
+        "s2r": 75.0,
+        "s3pk": 6.0,
+        "s3dp": 3.0,
+        "s4pr": 3.5,
+        "s4r": 67.5,
+        "cooldown": 5,
+        "b3lo": 0.0
+      },
+      "train": {
+        "train_full": {
+          "annualized_pct": 37.7,
+          "max_drawdown_pct": -5.8,
+          "sharpe": 2.42,
+          "win_rate_pct": 90.0,
+          "trade_count": 10,
+          "avg_win_pct": 8.6,
+          "excess_annualized_pct": 27.1,
+          "buy_hold_annualized_pct": 10.6,
+          "closed_trades": 10,
+          "holding_pct": 53.0
+        },
+        "train_early": {
+          "annualized_pct": 29.8,
+          "max_drawdown_pct": -5.8,
+          "sharpe": 2.29,
+          "win_rate_pct": 88.0,
+          "trade_count": 8,
+          "avg_win_pct": 6.4,
+          "excess_annualized_pct": 23.7,
+          "buy_hold_annualized_pct": 6.1,
+          "closed_trades": 8,
+          "holding_pct": 59.0
+        },
+        "train_late": {
+          "annualized_pct": 39.1,
+          "max_drawdown_pct": -5.4,
+          "sharpe": 2.53,
+          "win_rate_pct": 100.0,
+          "trade_count": 6,
+          "avg_win_pct": 9.5,
+          "excess_annualized_pct": 25.8,
+          "buy_hold_annualized_pct": 13.3,
+          "closed_trades": 6,
+          "holding_pct": 46.0
+        }
+      },
+      "validation": {
+        "test_2025_plus": {
+          "annualized_pct": 21.4,
+          "max_drawdown_pct": -6.6,
+          "sharpe": 1.59,
+          "win_rate_pct": 80.0,
+          "trade_count": 5,
+          "avg_win_pct": 6.8,
+          "excess_annualized_pct": 13.7,
+          "buy_hold_annualized_pct": 7.7,
+          "closed_trades": 5,
+          "holding_pct": 65.0
+        },
+        "full_snapshot": {
+          "annualized_pct": 30.5,
+          "max_drawdown_pct": -7.8,
+          "sharpe": 2.06,
+          "win_rate_pct": 88.0,
+          "trade_count": 16,
+          "avg_win_pct": 7.6,
+          "excess_annualized_pct": 21.5,
+          "buy_hold_annualized_pct": 9.0,
+          "closed_trades": 16,
+          "holding_pct": 60.0
+        }
+      },
+      "score": 30.613333333333337
+    },
+    {
+      "params": {
+        "b1": -1.0,
+        "b2": 1.0,
+        "b2r": 30.0,
+        "b3hi": 4.0,
+        "s1": 16.0,
+        "s2": 5.0,
+        "s2r": 75.0,
+        "s3pk": 5.0,
+        "s3dp": 2.33,
+        "s4pr": 3.5,
+        "s4r": 65.0,
+        "cooldown": 8,
+        "b3lo": 0.0
+      },
+      "train": {
+        "train_full": {
+          "annualized_pct": 37.9,
+          "max_drawdown_pct": -5.8,
+          "sharpe": 2.5,
+          "win_rate_pct": 90.0,
+          "trade_count": 10,
+          "avg_win_pct": 9.1,
+          "excess_annualized_pct": 27.4,
+          "buy_hold_annualized_pct": 10.6,
+          "closed_trades": 10,
+          "holding_pct": 48.0
+        },
+        "train_early": {
+          "annualized_pct": 30.1,
+          "max_drawdown_pct": -5.8,
+          "sharpe": 2.43,
+          "win_rate_pct": 86.0,
+          "trade_count": 7,
+          "avg_win_pct": 7.5,
+          "excess_annualized_pct": 24.0,
+          "buy_hold_annualized_pct": 6.1,
+          "closed_trades": 7,
+          "holding_pct": 49.0
+        },
+        "train_late": {
+          "annualized_pct": 37.6,
+          "max_drawdown_pct": -5.4,
+          "sharpe": 2.52,
+          "win_rate_pct": 100.0,
+          "trade_count": 6,
+          "avg_win_pct": 9.9,
+          "excess_annualized_pct": 24.3,
+          "buy_hold_annualized_pct": 13.3,
+          "closed_trades": 6,
+          "holding_pct": 39.0
+        }
+      },
+      "validation": {
+        "test_2025_plus": {
+          "annualized_pct": 19.4,
+          "max_drawdown_pct": -5.7,
+          "sharpe": 1.6,
+          "win_rate_pct": 100.0,
+          "trade_count": 6,
+          "avg_win_pct": 5.0,
+          "excess_annualized_pct": 11.7,
+          "buy_hold_annualized_pct": 7.7,
+          "closed_trades": 6,
+          "holding_pct": 58.0
+        },
+        "full_snapshot": {
+          "annualized_pct": 31.0,
+          "max_drawdown_pct": -5.8,
+          "sharpe": 2.21,
+          "win_rate_pct": 94.0,
+          "trade_count": 16,
+          "avg_win_pct": 7.6,
+          "excess_annualized_pct": 22.0,
+          "buy_hold_annualized_pct": 9.0,
+          "closed_trades": 16,
+          "holding_pct": 51.0
+        }
+      },
+      "score": 30.61
+    },
+    {
+      "params": {
+        "b1": -0.5,
+        "b2": 1.0,
+        "b2r": 31.67,
+        "b3hi": 5.0,
+        "s1": 14.0,
+        "s2": 7.0,
+        "s2r": 80.0,
+        "s3pk": 4.0,
+        "s3dp": 2.5,
+        "s4pr": 4.0,
+        "s4r": 65.0,
+        "cooldown": 10,
+        "b3lo": 0.0
+      },
+      "train": {
+        "train_full": {
+          "annualized_pct": 37.4,
+          "max_drawdown_pct": -6.2,
+          "sharpe": 2.42,
+          "win_rate_pct": 100.0,
+          "trade_count": 11,
+          "avg_win_pct": 7.7,
+          "excess_annualized_pct": 26.8,
+          "buy_hold_annualized_pct": 10.6,
+          "closed_trades": 11,
+          "holding_pct": 51.0
+        },
+        "train_early": {
+          "annualized_pct": 30.5,
+          "max_drawdown_pct": -5.1,
+          "sharpe": 2.43,
+          "win_rate_pct": 100.0,
+          "trade_count": 9,
+          "avg_win_pct": 5.8,
+          "excess_annualized_pct": 24.4,
+          "buy_hold_annualized_pct": 6.1,
+          "closed_trades": 9,
+          "holding_pct": 55.0
+        },
+        "train_late": {
+          "annualized_pct": 35.8,
+          "max_drawdown_pct": -6.3,
+          "sharpe": 2.31,
+          "win_rate_pct": 100.0,
+          "trade_count": 6,
+          "avg_win_pct": 8.8,
+          "excess_annualized_pct": 22.6,
+          "buy_hold_annualized_pct": 13.3,
+          "closed_trades": 6,
+          "holding_pct": 46.0
+        }
+      },
+      "validation": {
+        "test_2025_plus": {
+          "annualized_pct": 12.5,
+          "max_drawdown_pct": -5.7,
+          "sharpe": 1.05,
+          "win_rate_pct": 100.0,
+          "trade_count": 5,
+          "avg_win_pct": 3.9,
+          "excess_annualized_pct": 4.9,
+          "buy_hold_annualized_pct": 7.7,
+          "closed_trades": 5,
+          "holding_pct": 48.0
+        },
+        "full_snapshot": {
+          "annualized_pct": 27.2,
+          "max_drawdown_pct": -6.5,
+          "sharpe": 1.93,
+          "win_rate_pct": 100.0,
+          "trade_count": 17,
+          "avg_win_pct": 6.4,
+          "excess_annualized_pct": 18.2,
+          "buy_hold_annualized_pct": 9.0,
+          "closed_trades": 17,
+          "holding_pct": 55.0
+        }
+      },
+      "score": 30.21666666666667
+    },
+    {
+      "params": {
+        "b1": -0.5,
+        "b2": 1.5,
+        "b2r": 50.0,
+        "b3hi": 6.0,
+        "s1": 14.0,
+        "s2": 6.0,
+        "s2r": 80.0,
+        "s3pk": 6.0,
+        "s3dp": 1.5,
+        "s4pr": 3.5,
+        "s4r": 65.0,
+        "cooldown": 5,
+        "b3lo": 0.0
+      },
+      "train": {
+        "train_full": {
+          "annualized_pct": 37.0,
+          "max_drawdown_pct": -5.8,
+          "sharpe": 2.34,
+          "win_rate_pct": 92.0,
+          "trade_count": 13,
+          "avg_win_pct": 6.9,
+          "excess_annualized_pct": 26.4,
+          "buy_hold_annualized_pct": 10.6,
+          "closed_trades": 13,
+          "holding_pct": 56.0
+        },
+        "train_early": {
+          "annualized_pct": 30.8,
+          "max_drawdown_pct": -5.8,
+          "sharpe": 2.32,
+          "win_rate_pct": 100.0,
+          "trade_count": 9,
+          "avg_win_pct": 5.9,
+          "excess_annualized_pct": 24.7,
+          "buy_hold_annualized_pct": 6.1,
+          "closed_trades": 9,
+          "holding_pct": 59.0
+        },
+        "train_late": {
+          "annualized_pct": 35.8,
+          "max_drawdown_pct": -5.4,
+          "sharpe": 2.29,
+          "win_rate_pct": 89.0,
+          "trade_count": 9,
+          "avg_win_pct": 6.4,
+          "excess_annualized_pct": 22.6,
+          "buy_hold_annualized_pct": 13.3,
+          "closed_trades": 9,
+          "holding_pct": 51.0
+        }
+      },
+      "validation": {
+        "test_2025_plus": {
+          "annualized_pct": 17.3,
+          "max_drawdown_pct": -8.3,
+          "sharpe": 1.24,
+          "win_rate_pct": 86.0,
+          "trade_count": 7,
+          "avg_win_pct": 4.1,
+          "excess_annualized_pct": 9.7,
+          "buy_hold_annualized_pct": 7.7,
+          "closed_trades": 7,
+          "holding_pct": 64.0
+        },
+        "full_snapshot": {
+          "annualized_pct": 29.5,
+          "max_drawdown_pct": -8.3,
+          "sharpe": 1.96,
+          "win_rate_pct": 90.0,
+          "trade_count": 20,
+          "avg_win_pct": 5.9,
+          "excess_annualized_pct": 20.5,
+          "buy_hold_annualized_pct": 9.0,
+          "closed_trades": 20,
+          "holding_pct": 59.0
+        }
+      },
+      "score": 30.16833333333333
+    }
+  ]
+}

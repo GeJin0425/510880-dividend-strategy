@@ -1,0 +1,540 @@
+{
+  "fetched_at": "2026-09-07T17:51:00.536692+00:00",
+  "snapshot_sha256": "592380ab2f053df5c5d4ab9a8c2f16dc7d3dc1ce4d95e216d95ee4ed36b1e695",
+  "start": "2022-01-28",
+  "end": "2026-09-07",
+  "results": {
+    "baseline": {
+      "annualized_pct": 31.7,
+      "max_drawdown_pct": -5.8,
+      "sharpe": 2.18,
+      "win_rate_pct": 100.0,
+      "trade_count": 15,
+      "avg_win_pct": 8.4,
+      "excess_annualized_pct": 22.7,
+      "buy_hold_annualized_pct": 9.0,
+      "holding_pct": 53.9,
+      "total_return_pct": 255.53,
+      "calendar_returns_pct": {
+        "2022": 38.35,
+        "2023": 23.81,
+        "2024": 50.17,
+        "2025": 9.84,
+        "2026": 25.84
+      }
+    },
+    "without_b1": {
+      "annualized_pct": 22.9,
+      "max_drawdown_pct": -5.8,
+      "sharpe": 1.74,
+      "win_rate_pct": 100.0,
+      "trade_count": 14,
+      "avg_win_pct": 6.5,
+      "excess_annualized_pct": 13.9,
+      "buy_hold_annualized_pct": 9.0,
+      "holding_pct": 47.3,
+      "total_return_pct": 158.78,
+      "calendar_returns_pct": {
+        "2022": 12.59,
+        "2023": 20.65,
+        "2024": 45.0,
+        "2025": 9.85,
+        "2026": 19.6
+      }
+    },
+    "without_b2": {
+      "annualized_pct": 30.5,
+      "max_drawdown_pct": -5.9,
+      "sharpe": 2.11,
+      "win_rate_pct": 100.0,
+      "trade_count": 15,
+      "avg_win_pct": 8.1,
+      "excess_annualized_pct": 21.5,
+      "buy_hold_annualized_pct": 9.0,
+      "holding_pct": 53.5,
+      "total_return_pct": 241.44,
+      "calendar_returns_pct": {
+        "2022": 38.35,
+        "2023": 19.08,
+        "2024": 50.0,
+        "2025": 9.81,
+        "2026": 25.83
+      }
+    },
+    "without_b3": {
+      "annualized_pct": 28.2,
+      "max_drawdown_pct": -7.4,
+      "sharpe": 2.01,
+      "win_rate_pct": 100.0,
+      "trade_count": 11,
+      "avg_win_pct": 10.0,
+      "excess_annualized_pct": 19.2,
+      "buy_hold_annualized_pct": 9.0,
+      "holding_pct": 47.1,
+      "total_return_pct": 213.84,
+      "calendar_returns_pct": {
+        "2022": 37.25,
+        "2023": 15.19,
+        "2024": 51.11,
+        "2025": 10.66,
+        "2026": 18.71
+      }
+    },
+    "without_s1": {
+      "annualized_pct": 31.7,
+      "max_drawdown_pct": -5.8,
+      "sharpe": 2.18,
+      "win_rate_pct": 100.0,
+      "trade_count": 15,
+      "avg_win_pct": 8.4,
+      "excess_annualized_pct": 22.7,
+      "buy_hold_annualized_pct": 9.0,
+      "holding_pct": 53.9,
+      "total_return_pct": 255.53,
+      "calendar_returns_pct": {
+        "2022": 38.35,
+        "2023": 23.81,
+        "2024": 50.17,
+        "2025": 9.84,
+        "2026": 25.84
+      }
+    },
+    "without_s2": {
+      "annualized_pct": 27.5,
+      "max_drawdown_pct": -7.5,
+      "sharpe": 1.98,
+      "win_rate_pct": 100.0,
+      "trade_count": 15,
+      "avg_win_pct": 7.4,
+      "excess_annualized_pct": 18.5,
+      "buy_hold_annualized_pct": 9.0,
+      "holding_pct": 54.3,
+      "total_return_pct": 206.72,
+      "calendar_returns_pct": {
+        "2022": 38.35,
+        "2023": 28.19,
+        "2024": 25.13,
+        "2025": 9.85,
+        "2026": 25.82
+      }
+    },
+    "without_s3": {
+      "annualized_pct": 25.7,
+      "max_drawdown_pct": -12.4,
+      "sharpe": 1.69,
+      "win_rate_pct": 100.0,
+      "trade_count": 12,
+      "avg_win_pct": 8.7,
+      "excess_annualized_pct": 16.7,
+      "buy_hold_annualized_pct": 9.0,
+      "holding_pct": 57.4,
+      "total_return_pct": 186.48,
+      "calendar_returns_pct": {
+        "2022": 27.78,
+        "2023": 23.79,
+        "2024": 54.77,
+        "2025": 2.09,
+        "2026": 14.62
+      }
+    },
+    "without_s4": {
+      "annualized_pct": 28.8,
+      "max_drawdown_pct": -6.4,
+      "sharpe": 1.92,
+      "win_rate_pct": 100.0,
+      "trade_count": 12,
+      "avg_win_pct": 8.5,
+      "excess_annualized_pct": 19.8,
+      "buy_hold_annualized_pct": 9.0,
+      "holding_pct": 61.0,
+      "total_return_pct": 220.45,
+      "calendar_returns_pct": {
+        "2022": 24.77,
+        "2023": 21.93,
+        "2024": 50.09,
+        "2025": 11.13,
+        "2026": 26.29
+      }
+    },
+    "flow_delay_1": {
+      "annualized_pct": 31.7,
+      "max_drawdown_pct": -5.8,
+      "sharpe": 2.18,
+      "win_rate_pct": 100.0,
+      "trade_count": 15,
+      "avg_win_pct": 8.4,
+      "excess_annualized_pct": 22.7,
+      "buy_hold_annualized_pct": 9.0,
+      "holding_pct": 53.9,
+      "total_return_pct": 255.53,
+      "calendar_returns_pct": {
+        "2022": 38.35,
+        "2023": 23.81,
+        "2024": 50.17,
+        "2025": 9.84,
+        "2026": 25.84
+      }
+    },
+    "flow_delay_2": {
+      "annualized_pct": 31.5,
+      "max_drawdown_pct": -5.8,
+      "sharpe": 2.17,
+      "win_rate_pct": 100.0,
+      "trade_count": 15,
+      "avg_win_pct": 8.4,
+      "excess_annualized_pct": 22.6,
+      "buy_hold_annualized_pct": 9.0,
+      "holding_pct": 53.6,
+      "total_return_pct": 253.7,
+      "calendar_returns_pct": {
+        "2022": 38.35,
+        "2023": 23.13,
+        "2024": 50.21,
+        "2025": 9.83,
+        "2026": 25.85
+      }
+    },
+    "extra_cost_5bps_per_leg": {
+      "annualized_pct": 30.9,
+      "max_drawdown_pct": -5.8,
+      "sharpe": 2.13,
+      "win_rate_pct": 100.0,
+      "trade_count": 15,
+      "avg_win_pct": 8.4,
+      "excess_annualized_pct": 21.9,
+      "buy_hold_annualized_pct": 9.0,
+      "holding_pct": 53.9,
+      "total_return_pct": 245.66,
+      "calendar_returns_pct": {
+        "2022": 37.18,
+        "2023": 23.08,
+        "2024": 49.58,
+        "2025": 9.28,
+        "2026": 25.24
+      }
+    },
+    "extra_cost_10bps_per_leg": {
+      "annualized_pct": 30.0,
+      "max_drawdown_pct": -5.8,
+      "sharpe": 2.08,
+      "win_rate_pct": 100.0,
+      "trade_count": 15,
+      "avg_win_pct": 8.4,
+      "excess_annualized_pct": 21.0,
+      "buy_hold_annualized_pct": 9.0,
+      "holding_pct": 53.9,
+      "total_return_pct": 234.92,
+      "calendar_returns_pct": {
+        "2022": 36.05,
+        "2023": 22.36,
+        "2024": 48.46,
+        "2025": 8.76,
+        "2026": 24.59
+      }
+    },
+    "extra_cost_20bps_per_leg": {
+      "annualized_pct": 28.4,
+      "max_drawdown_pct": -5.8,
+      "sharpe": 1.98,
+      "win_rate_pct": 100.0,
+      "trade_count": 15,
+      "avg_win_pct": 8.4,
+      "excess_annualized_pct": 19.5,
+      "buy_hold_annualized_pct": 9.0,
+      "holding_pct": 53.9,
+      "total_return_pct": 216.87,
+      "calendar_returns_pct": {
+        "2022": 33.88,
+        "2023": 20.95,
+        "2024": 47.24,
+        "2025": 7.73,
+        "2026": 23.37
+      }
+    },
+    "rounded_parameters": {
+      "annualized_pct": 32.6,
+      "max_drawdown_pct": -5.8,
+      "sharpe": 2.32,
+      "win_rate_pct": 100.0,
+      "trade_count": 15,
+      "avg_win_pct": 8.5,
+      "excess_annualized_pct": 23.6,
+      "buy_hold_annualized_pct": 9.0,
+      "holding_pct": 52.2,
+      "total_return_pct": 266.47,
+      "calendar_returns_pct": {
+        "2022": 38.18,
+        "2023": 24.87,
+        "2024": 55.37,
+        "2025": 12.09,
+        "2026": 21.95
+      }
+    }
+  },
+  "event_results": {
+    "full": {
+      "annualized_pct": 31.7,
+      "max_drawdown_pct": -5.8,
+      "sharpe": 2.18,
+      "win_rate_pct": 100.0,
+      "trade_count": 15,
+      "avg_win_pct": 8.4,
+      "excess_annualized_pct": 22.7,
+      "buy_hold_annualized_pct": 9.0,
+      "holding_pct": 53.9,
+      "add_count": 0,
+      "max_equity_difference_vs_legacy": 0.0
+    },
+    "b1_half": {
+      "annualized_pct": 21.8,
+      "max_drawdown_pct": -5.7,
+      "sharpe": 2.01,
+      "win_rate_pct": 100.0,
+      "trade_count": 15,
+      "avg_win_pct": 8.4,
+      "excess_annualized_pct": 12.8,
+      "buy_hold_annualized_pct": 9.0,
+      "holding_pct": 53.9,
+      "add_count": 0
+    },
+    "b1_half_confirm": {
+      "annualized_pct": 30.1,
+      "max_drawdown_pct": -5.8,
+      "sharpe": 2.15,
+      "win_rate_pct": 100.0,
+      "trade_count": 15,
+      "avg_win_pct": 8.0,
+      "excess_annualized_pct": 21.1,
+      "buy_hold_annualized_pct": 9.0,
+      "holding_pct": 53.9,
+      "add_count": 6
+    },
+    "high_vol_half": {
+      "annualized_pct": 28.1,
+      "max_drawdown_pct": -5.8,
+      "sharpe": 2.06,
+      "win_rate_pct": 100.0,
+      "trade_count": 15,
+      "avg_win_pct": 8.4,
+      "excess_annualized_pct": 19.1,
+      "buy_hold_annualized_pct": 9.0,
+      "holding_pct": 53.9,
+      "add_count": 0
+    },
+    "bond_ma60_guard": {
+      "annualized_pct": 31.0,
+      "max_drawdown_pct": -5.8,
+      "sharpe": 2.17,
+      "win_rate_pct": 100.0,
+      "trade_count": 15,
+      "avg_win_pct": 8.4,
+      "excess_annualized_pct": 22.0,
+      "buy_hold_annualized_pct": 9.0,
+      "holding_pct": 53.9,
+      "add_count": 0
+    },
+    "slippage_5bps": {
+      "annualized_pct": 30.9,
+      "max_drawdown_pct": -5.8,
+      "sharpe": 2.13,
+      "win_rate_pct": 100.0,
+      "trade_count": 15,
+      "avg_win_pct": 8.3,
+      "excess_annualized_pct": 21.9,
+      "buy_hold_annualized_pct": 9.0,
+      "holding_pct": 53.9,
+      "add_count": 0
+    },
+    "slippage_10bps": {
+      "annualized_pct": 30.0,
+      "max_drawdown_pct": -5.8,
+      "sharpe": 2.08,
+      "win_rate_pct": 100.0,
+      "trade_count": 15,
+      "avg_win_pct": 8.2,
+      "excess_annualized_pct": 21.0,
+      "buy_hold_annualized_pct": 9.0,
+      "holding_pct": 53.9,
+      "add_count": 0
+    },
+    "slippage_20bps": {
+      "annualized_pct": 28.4,
+      "max_drawdown_pct": -5.8,
+      "sharpe": 1.98,
+      "win_rate_pct": 93.0,
+      "trade_count": 15,
+      "avg_win_pct": 8.0,
+      "excess_annualized_pct": 19.5,
+      "buy_hold_annualized_pct": 9.0,
+      "holding_pct": 53.9,
+      "add_count": 0
+    }
+  },
+  "trades": [
+    {
+      "buy_date": "2022-02-09",
+      "sell_date": "2022-02-25",
+      "level": "b3",
+      "reason": "偏离回落:6.0%→3.5%",
+      "pnl_pct": 0.38,
+      "mae_pct": -0.88,
+      "mfe_pct": 2.85,
+      "hold_days": 16,
+      "underwater_closes": 1
+    },
+    {
+      "buy_date": "2022-03-16",
+      "sell_date": "2022-04-08",
+      "level": "b1",
+      "reason": "RSI下穿68:+13.8%",
+      "pnl_pct": 13.65,
+      "mae_pct": -2.79,
+      "mfe_pct": 15.77,
+      "hold_days": 23,
+      "underwater_closes": 0
+    },
+    {
+      "buy_date": "2022-04-27",
+      "sell_date": "2022-09-08",
+      "level": "b1",
+      "reason": "RSI下穿68:+11.2%",
+      "pnl_pct": 11.11,
+      "mae_pct": -1.39,
+      "mfe_pct": 11.63,
+      "hold_days": 134,
+      "underwater_closes": 0
+    },
+    {
+      "buy_date": "2022-10-31",
+      "sell_date": "2022-12-01",
+      "level": "b1",
+      "reason": "RSI下穿68:+7.1%",
+      "pnl_pct": 7.96,
+      "mae_pct": -3.17,
+      "mfe_pct": 8.82,
+      "hold_days": 31,
+      "underwater_closes": 4
+    },
+    {
+      "buy_date": "2022-12-26",
+      "sell_date": "2023-03-10",
+      "level": "b1",
+      "reason": "RSI下穿68:+7.4%",
+      "pnl_pct": 7.27,
+      "mae_pct": -0.38,
+      "mfe_pct": 9.34,
+      "hold_days": 74,
+      "underwater_closes": 2
+    },
+    {
+      "buy_date": "2023-04-03",
+      "sell_date": "2023-05-05",
+      "level": "b3",
+      "reason": "RSI确认:RSI=81,偏离11.4%",
+      "pnl_pct": 8.45,
+      "mae_pct": 0.0,
+      "mfe_pct": 8.45,
+      "hold_days": 32,
+      "underwater_closes": 0
+    },
+    {
+      "buy_date": "2023-06-27",
+      "sell_date": "2023-08-03",
+      "level": "b2",
+      "reason": "RSI下穿68:+7.3%",
+      "pnl_pct": 7.02,
+      "mae_pct": 0.0,
+      "mfe_pct": 9.5,
+      "hold_days": 37,
+      "underwater_closes": 0
+    },
+    {
+      "buy_date": "2023-10-24",
+      "sell_date": "2024-02-27",
+      "level": "b2",
+      "reason": "偏离回落:10.7%→7.6%",
+      "pnl_pct": 8.43,
+      "mae_pct": -4.33,
+      "mfe_pct": 12.53,
+      "hold_days": 126,
+      "underwater_closes": 14
+    },
+    {
+      "buy_date": "2024-09-09",
+      "sell_date": "2024-10-08",
+      "level": "b1",
+      "reason": "RSI确认:RSI=81,偏离12.2%",
+      "pnl_pct": 26.62,
+      "mae_pct": -3.94,
+      "mfe_pct": 26.62,
+      "hold_days": 29,
+      "underwater_closes": 9
+    },
+    {
+      "buy_date": "2024-11-28",
+      "sell_date": "2024-12-23",
+      "level": "b3",
+      "reason": "偏离回落:7.4%→5.0%",
+      "pnl_pct": 2.34,
+      "mae_pct": -0.21,
+      "mfe_pct": 5.85,
+      "hold_days": 25,
+      "underwater_closes": 0
+    },
+    {
+      "buy_date": "2025-01-14",
+      "sell_date": "2025-06-30",
+      "level": "b2",
+      "reason": "RSI下穿68:+5.6%",
+      "pnl_pct": 5.43,
+      "mae_pct": -3.72,
+      "mfe_pct": 6.94,
+      "hold_days": 167,
+      "underwater_closes": 2
+    },
+    {
+      "buy_date": "2025-09-12",
+      "sell_date": "2025-11-18",
+      "level": "b3",
+      "reason": "RSI下穿68:+5.0%",
+      "pnl_pct": 4.82,
+      "mae_pct": -3.23,
+      "mfe_pct": 6.63,
+      "hold_days": 67,
+      "underwater_closes": 16
+    },
+    {
+      "buy_date": "2025-12-11",
+      "sell_date": "2026-03-05",
+      "level": "b2",
+      "reason": "RSI下穿68:+9.0%",
+      "pnl_pct": 8.35,
+      "mae_pct": -1.49,
+      "mfe_pct": 12.34,
+      "hold_days": 84,
+      "underwater_closes": 9
+    },
+    {
+      "buy_date": "2026-06-01",
+      "sell_date": "2026-06-12",
+      "level": "b3",
+      "reason": "偏离回落:6.6%→4.2%",
+      "pnl_pct": 1.06,
+      "mae_pct": -0.19,
+      "mfe_pct": 4.76,
+      "hold_days": 11,
+      "underwater_closes": 0
+    },
+    {
+      "buy_date": "2026-06-30",
+      "sell_date": "2026-08-26",
+      "level": "b1",
+      "reason": "RSI下穿68:+14.8%",
+      "pnl_pct": 13.7,
+      "mae_pct": -2.32,
+      "mfe_pct": 16.3,
+      "hold_days": 57,
+      "underwater_closes": 2
+    }
+  ]
+}

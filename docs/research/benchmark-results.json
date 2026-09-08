@@ -1,0 +1,206 @@
+{
+  "start": "2022-01-28",
+  "end": "2026-09-07",
+  "audit_snapshot_sha256": "592380ab2f053df5c5d4ab9a8c2f16dc7d3dc1ce4d95e216d95ee4ed36b1e695",
+  "history_sha256": "b77ecdf383b52a2a521988ee741919ec08d97fe2c20e0ae5c1e5963c1f162d6e",
+  "benchmarks": {
+    "strategy_with_bonds": {
+      "annualized_pct": 31.69,
+      "total_return_pct": 255.53,
+      "max_drawdown_pct": -5.76,
+      "sharpe": 2.18,
+      "final_equity": 355525.94,
+      "closed_trades": 15,
+      "open_position": false
+    },
+    "strategy_with_cash": {
+      "annualized_pct": 29.45,
+      "total_return_pct": 228.51,
+      "max_drawdown_pct": -6.5,
+      "sharpe": 2.08,
+      "final_equity": 328508.75,
+      "closed_trades": 15,
+      "open_position": false
+    },
+    "no_flow_with_bonds": {
+      "annualized_pct": 30.39,
+      "total_return_pct": 239.63,
+      "max_drawdown_pct": -9.04,
+      "sharpe": 2.08,
+      "final_equity": 339630.17,
+      "closed_trades": 15,
+      "open_position": false
+    },
+    "only_b1_with_bonds": {
+      "annualized_pct": 25.14,
+      "total_return_pct": 181.03,
+      "max_drawdown_pct": -5.76,
+      "sharpe": 2.07,
+      "final_equity": 281033.75,
+      "closed_trades": 8,
+      "open_position": false
+    },
+    "buy_hold_510880": {
+      "annualized_pct": 8.9,
+      "total_return_pct": 48.15,
+      "max_drawdown_pct": -14.04,
+      "sharpe": 0.52,
+      "final_equity": 148152.4,
+      "fees": 5.0,
+      "turnover": 99985.6
+    },
+    "buy_hold_511260": {
+      "annualized_pct": 3.64,
+      "total_return_pct": 17.93,
+      "max_drawdown_pct": -2.0,
+      "sharpe": 0.9,
+      "final_equity": 117927.46,
+      "fees": 4.54,
+      "turnover": 90779.2
+    },
+    "50_50_monthly": {
+      "annualized_pct": 6.66,
+      "total_return_pct": 34.6,
+      "max_drawdown_pct": -6.5,
+      "sharpe": 0.64,
+      "final_equity": 134601.5,
+      "fees": 32.2,
+      "turnover": 200039.6
+    },
+    "50_50_quarterly": {
+      "annualized_pct": 6.54,
+      "total_return_pct": 33.89,
+      "max_drawdown_pct": -6.53,
+      "sharpe": 0.63,
+      "final_equity": 133892.65,
+      "fees": 14.55,
+      "turnover": 149915.2
+    },
+    "54_46_monthly_descriptive": {
+      "annualized_pct": 6.99,
+      "total_return_pct": 36.51,
+      "max_drawdown_pct": -7.06,
+      "sharpe": 0.64,
+      "final_equity": 136511.27,
+      "fees": 31.63,
+      "turnover": 187551.7
+    },
+    "ma250_trend": {
+      "annualized_pct": -2.23,
+      "total_return_pct": -9.86,
+      "max_drawdown_pct": -24.04,
+      "sharpe": -0.23,
+      "final_equity": 90138.97,
+      "fees": 481.93,
+      "turnover": 9638615.1
+    }
+  },
+  "historical_windows": {
+    "2016-01-01": {
+      "start": "2016-01-04",
+      "end": "2017-12-29",
+      "core_no_flow_cash": {
+        "annualized_pct": 1.98,
+        "total_return_pct": 3.97,
+        "max_drawdown_pct": -18.62,
+        "sharpe": 0.06,
+        "final_equity": 103967.8,
+        "closed_trades": 2,
+        "open_position": false
+      },
+      "buy_hold": {
+        "annualized_pct": 7.12,
+        "total_return_pct": 14.63,
+        "max_drawdown_pct": -22.28,
+        "sharpe": 0.6,
+        "final_equity": 114627.8
+      }
+    },
+    "2018-01-01": {
+      "start": "2018-01-02",
+      "end": "2021-12-31",
+      "core_no_flow_cash": {
+        "annualized_pct": 14.78,
+        "total_return_pct": 73.42,
+        "max_drawdown_pct": -13.85,
+        "sharpe": 1.06,
+        "final_equity": 173419.61,
+        "closed_trades": 9,
+        "open_position": true
+      },
+      "buy_hold": {
+        "annualized_pct": 2.49,
+        "total_return_pct": 10.32,
+        "max_drawdown_pct": -23.4,
+        "sharpe": 0.1,
+        "final_equity": 110324.2
+      }
+    },
+    "2022-01-28": {
+      "start": "2022-01-28",
+      "end": "2023-12-29",
+      "core_no_flow_cash": {
+        "annualized_pct": 31.11,
+        "total_return_pct": 68.05,
+        "max_drawdown_pct": -5.75,
+        "sharpe": 2.52,
+        "final_equity": 168046.42,
+        "closed_trades": 7,
+        "open_position": true
+      },
+      "buy_hold": {
+        "annualized_pct": 5.9,
+        "total_return_pct": 11.62,
+        "max_drawdown_pct": -11.9,
+        "sharpe": 0.35,
+        "final_equity": 111619.2
+      }
+    },
+    "2024-01-01": {
+      "start": "2024-01-02",
+      "end": "2026-09-07",
+      "core_no_flow_cash": {
+        "annualized_pct": 25.06,
+        "total_return_pct": 82.1,
+        "max_drawdown_pct": -10.62,
+        "sharpe": 1.63,
+        "final_equity": 182099.05,
+        "closed_trades": 8,
+        "open_position": false
+      },
+      "buy_hold": {
+        "annualized_pct": 11.13,
+        "total_return_pct": 32.68,
+        "max_drawdown_pct": -14.02,
+        "sharpe": 0.6,
+        "final_equity": 132682.61
+      }
+    }
+  },
+  "price_index_transfer": {
+    "sh000922": {
+      "status": "insufficient history"
+    },
+    "sz399324": {
+      "start": "2022-01-28",
+      "end": "2026-09-07",
+      "sha256": "1fd6c06929c3f9501926cdf74a4bc7dc96b0e2e6e43638d81ffea5ddb5cb91d8",
+      "core_no_flow_cash": {
+        "annualized_pct": -0.37,
+        "total_return_pct": -1.68,
+        "max_drawdown_pct": -33.31,
+        "sharpe": -0.07,
+        "final_equity": 98320.5,
+        "closed_trades": 5,
+        "open_position": true
+      },
+      "buy_hold_price_index": {
+        "annualized_pct": -6.07,
+        "total_return_pct": -25.08,
+        "max_drawdown_pct": -35.07,
+        "sharpe": -0.35,
+        "final_equity": 74924.69
+      }
+    }
+  }
+}

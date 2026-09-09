@@ -2,7 +2,9 @@ name: Deploy dashboard
 
 on:
   schedule:
-    - cron: '40 7 * * *'
+    # UTC 工作日 16:30，即北京时间次日 00:30：留出上交所
+    # ETF 清算后规模数据（每交易日 23:00 更新）的落库缓冲时间。
+    - cron: '30 16 * * 1-5'
   workflow_dispatch: {}
 
 permissions:

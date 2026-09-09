@@ -8,7 +8,7 @@
 - 主图支持 全部 / YTD / 近1年 / 近3年 / 近5年 时间范围切换
 - 支持 自动 / 浅色 / 深色 主题切换（默认跟随系统）
 - 新增回撤面板、MA250斜率、加载骨架屏与数据过期提示
-- 每日北京时间15:40自动抓取行情、重新计算指标并发布（GitHub Actions）
+- 每个交易日清算后的北京时间次日00:30自动抓取完整行情与基金规模、重新计算指标并发布（GitHub Actions）
 - 详细设计文档：[docs/superpowers/specs/2026-08-06-github-pages-dashboard-design.md](docs/superpowers/specs/2026-08-06-github-pages-dashboard-design.md)
 - 当前 next-open 参数调优报告：[docs/research/2026-09-08-510880-next-open-tuning.md](docs/research/2026-09-08-510880-next-open-tuning.md)
 

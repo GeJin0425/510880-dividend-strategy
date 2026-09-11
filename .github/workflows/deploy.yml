@@ -31,7 +31,21 @@ jobs:
 
       - run: pip install -r requirements.txt
 
-      - run: python -m pipeline.export
+      # Upstream ETF price/scale endpoints occasionally publish late or return
+      # a transient error.  Do not deploy incomplete data; retry the complete
+      # export before preserving the last known-good Pages version.
+      - name: Generate dashboard data (retry transient upstream failures)
+        run: |
+          for attempt in 1 2 3; do
+            if python -m pipeline.export; then
+              exit 0
+            fi
+            if [ "$attempt" -lt 3 ]; then
+              echo "Export failed (attempt $attempt); retrying in 5 minutes..."
+              sleep 300
+            fi
+          done
+          exit 1
 
       - name: Verify generated data.json is valid
         run: python -c "import json; json.load(open('site/data.json'))" && echo "data.json is valid JSON"

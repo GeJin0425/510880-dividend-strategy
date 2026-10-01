@@ -26,22 +26,45 @@ DIVIDENDS_511260 = [
     ('2025-12-26', 0.8330),
     ('2026-03-25', 0.6711),
     ('2026-06-25', 1.2686),
+    # Fund announcement 2026-09-15: 12.747 CNY per 10 units; ex-date Sep 18.
+    # https://money.finance.sina.com.cn/fund/go.php/vAkFundInfo_JJGKXX/q/5553065.phtml
+    ('2026-09-18', 1.2747),
 ]
 
 
 def apply_qfq(df, dividends):
     """对不复权日线做前复权调整，并保留可与券商报价核对的原始 OHLC。"""
+    if df.attrs.get('price_basis') != 'raw':
+        raise ValueError('apply_qfq requires explicitly raw OHLC; adjusted/unknown input is unsafe')
+    if df.empty or not isinstance(df.index, pd.DatetimeIndex) or not df.index.is_unique:
+        raise ValueError('raw OHLC must have nonempty unique datetime dates')
     df = df.sort_index()
+    if not np.isfinite(df[['open', 'close', 'high', 'low', 'volume']].to_numpy()).all():
+        raise ValueError('raw OHLCV must be finite')
+    if (df[['open', 'close', 'high', 'low']] <= 0).any().any():
+        raise ValueError('raw OHLC must be positive')
     factor = np.ones(len(df))
+    applied = []
+    seen = set()
     for ex_str, div in dividends:
         ex = pd.Timestamp(ex_str)
+        if ex in seen or not np.isfinite(div) or div <= 0:
+            raise ValueError('dividends must have unique dates and positive finite amounts')
+        seen.add(ex)
+        # No future dividend is applied to an earlier historical snapshot.
+        if ex > df.index[-1] or ex <= df.index[0]:
+            continue
         mask = df.index < ex
         if mask.any():
+            if ex not in df.index:
+                raise ValueError(f'missing ex-dividend price session: {ex:%Y-%m-%d}')
             prev_close = df.loc[mask, 'close'].iloc[-1]
-            ex_idx = df.index.get_indexer([ex], method='nearest')[0]
-            factor[:ex_idx] *= (prev_close - div) / prev_close
+            if div >= prev_close:
+                raise ValueError(f'dividend is not below previous raw close: {ex:%Y-%m-%d}')
+            factor[mask] *= (prev_close - div) / prev_close
+            applied.append({'ex_date': ex_str, 'cash_per_unit': float(div)})
 
-    return pd.DataFrame({
+    result = pd.DataFrame({
         'open': (df['open'].values * factor).round(3),
         'close': (df['close'].values * factor).round(3),
         'high': (df['high'].values * factor).round(3),
@@ -53,6 +76,10 @@ def apply_qfq(df, dividends):
         'low_raw': df['low'].values,
         'adjust_factor': factor.round(6),
     }, index=df.index)
+    result.attrs.update(df.attrs)
+    result.attrs.update(price_basis='qfq', raw_price_basis='raw',
+                        adjustment_method='cash_dividend_ratio', dividends_applied=applied)
+    return result
 
 
 def fetch_510880_qfq(count=3000):

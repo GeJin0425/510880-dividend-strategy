@@ -5,12 +5,16 @@ from datetime import datetime, timedelta, timezone
 import numpy as np
 import pandas as pd
 
-from .backtest import backtest
 from .event_engine import simulate
 from .fetch import fetch_510880_qfq, fetch_511260_qfq
 from .indicators import add_indicators
-from .share_flow import add_share_flow_indicators, derive_shares_from_scale, fetch_sse_scale_history
-from .strategy import PARAMS, PARAMS_VERSION, run_strategy
+from .market_sessions import validate_sse_frame
+from .share_flow import (
+    add_share_flow_indicators,
+    derive_shares_from_scale,
+    fetch_sse_scale_history,
+)
+from .strategy import PARAMS, PARAMS_VERSION
 
 SELL_TIER_ORDER = ['硬上限', 'RSI确认', '偏离回落', 'RSI下穿']
 DISPLAY_START = '2018-01-01'
@@ -180,9 +184,9 @@ def build_trades(buys, sells, prices):
 
 def build_signals(df):
     """Close-known markers, including orders that have not executed yet."""
-    return [dict(date=date.strftime('%Y-%m-%d'), action='BUY' if row['signal'] == 1 else 'SELL',
-                 close=float(row['close']), reason=row.get('buy_level', '') if row['signal'] == 1
-                 else row.get('sell_reason', ''), pending=i == len(df) - 1)
+    return [{'date': date.strftime('%Y-%m-%d'), 'action': 'BUY' if row['signal'] == 1 else 'SELL',
+             'close': float(row['close']), 'reason': row.get('buy_level', '') if row['signal'] == 1
+             else row.get('sell_reason', ''), 'pending': i == len(df) - 1}
             for i, (date, row) in enumerate(df.iterrows()) if row['signal'] in (1, -1)]
 
 
@@ -234,15 +238,23 @@ def build_series(df2, eq2, dd_series):
     }
 
 
-def export(output_path, count_510880=3000, count_511260=2500):
+def export(output_path, count_510880=3000, count_511260=2500, *, now=None):
+    # Freeze the clock once: crossing the close during a multi-source fetch must
+    # not produce inconsistent freshness expectations or a fresh-looking stamp.
+    beijing_now = (datetime.now(timezone(timedelta(hours=8))) if now is None
+                   else pd.Timestamp(now).to_pydatetime())
     raw = fetch_510880_qfq(count=count_510880)
     if len(raw) < 400:
         raise ValueError(
             f'510880数据只拉到{len(raw)}条,远少于预期,可能是接口返回被截断'
         )
+    expected_session = validate_sse_frame(raw, '510880', now=beijing_now)
     scale = fetch_sse_scale_history('510880')
     if len(scale) < 300:
         raise ValueError(f'510880规模数据只有{len(scale)}条，无法可靠计算资金流标准分')
+    validate_sse_frame(scale, '510880份额规模', now=beijing_now)
+    if not np.isfinite(scale['scale_yi']).all() or (scale['scale_yi'] <= 0).any():
+        raise ValueError('份额规模数据缺失或无效，不能可靠计算资金流')
     # Preserve price sessions. Missing scale must not skip a real execution day.
     df = add_indicators(raw).join(scale, how='left')
     first_scale = df['scale_yi'].first_valid_index()
@@ -255,6 +267,14 @@ def export(output_path, count_510880=3000, count_511260=2500):
         raise ValueError('510880规模历史不足，无法计算flow_z20')
     df = df[df.index >= flow_start].copy()
     idle_price = fetch_511260_qfq(count=count_511260)
+    # 511260 has no indicator warmup in production: only the effective strategy
+    # window is consumed by simulate(). Do not intersect calendars or fill bars.
+    # A historical no-quote gap before this window must not block current data.
+    idle_consumed = idle_price.loc[idle_price.index >= df.index[0]]
+    missing_idle = df.index.difference(idle_consumed.index)
+    if len(missing_idle):
+        raise ValueError(f'511260: missing trading dates: {missing_idle[0]:%Y-%m-%d}')
+    validate_sse_frame(idle_consumed, '511260', now=beijing_now)
     df_sig, eq, tr = simulate(
         df, idle_price, params=PARAMS, flow_rule=FLOW_RULE, comm=FEE_RATE, min_comm=FEE_MIN,
     )
@@ -268,8 +288,6 @@ def export(output_path, count_510880=3000, count_511260=2500):
     stats, dd_series = compute_stats(df2, eq2, sells)
     stats['holding_pct'] = compute_holding_pct(buys, sells, df2)
 
-    beijing_now = datetime.now(timezone(timedelta(hours=8)))
-
     payload = {
         'meta': {
             **stats,
@@ -281,6 +299,17 @@ def export(output_path, count_510880=3000, count_511260=2500):
             'flow_data_source': 'SSE scale / raw close',
             'updated_at': beijing_now.isoformat(),
             'as_of_date': df2.index[-1].strftime('%Y-%m-%d'),
+            'expected_session': expected_session.strftime('%Y-%m-%d'),
+            'session_calendar': 'exchange_calendars XSHG; SSE-verified 2026',
+            'price_data': {
+                '510880': dict(raw.attrs),
+                '511260': dict(idle_price.attrs),
+            },
+            'validation_windows': {
+                '510880_price_with_indicator_warmup': raw.index[0].strftime('%Y-%m-%d'),
+                '510880_scale_with_flow_warmup': scale.index[0].strftime('%Y-%m-%d'),
+                '511260_consumed_price': df.index[0].strftime('%Y-%m-%d'),
+            },
         },
         'current_status': build_current_status(
             df2,

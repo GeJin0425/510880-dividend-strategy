@@ -5,11 +5,12 @@ import pandas as pd
 import pytest
 
 import pipeline.export as export_mod
+from pipeline.market_sessions import sse_sessions
 
 
 def _build_fixture():
     # 总长度需 >= export.py 的 400 条最小史长哨兵检查（见 export() 里的截断保护）
-    dates = pd.date_range('2018-01-01', periods=410, freq='D')
+    dates = sse_sessions('2018-01-02', '2020-12-31')[:410]
     prices = np.concatenate([
         np.full(300, 100.0),               # 平盘，喂饱MA250与资金流热身期
         [95.0],                             # 急跌 -> 偏离度<-2% 触发L1买入
@@ -28,7 +29,13 @@ def _build_fixture():
     }, index=dates)
     shares = np.exp(np.arange(410) * 0.0005 + np.sin(np.arange(410) / 11) * 0.01)
     scale = pd.DataFrame({'scale_yi': shares * prices}, index=dates)
+    df.attrs.update(provider='Fixture', price_basis='qfq', raw_price_basis='raw')
+    idle.attrs.update(provider='Fixture', price_basis='qfq', raw_price_basis='raw')
     return df, idle, scale
+
+
+def _fixture_now(frame):
+    return (frame.index[-1] + pd.Timedelta(hours=16)).tz_localize('Asia/Shanghai')
 
 
 def test_export_end_to_end(tmp_path, monkeypatch):
@@ -40,7 +47,7 @@ def test_export_end_to_end(tmp_path, monkeypatch):
     monkeypatch.setattr(export_mod, 'DISPLAY_START', fixture_df.index[255].strftime('%Y-%m-%d'))
 
     out_path = tmp_path / 'data.json'
-    payload = export_mod.export(str(out_path))
+    payload = export_mod.export(str(out_path), now=_fixture_now(fixture_df))
 
     assert out_path.exists()
     reloaded = json.loads(out_path.read_text(encoding='utf-8'))
@@ -108,7 +115,7 @@ def test_export_open_position_and_signal_use_real_account(tmp_path, monkeypatch)
     monkeypatch.setattr(export_mod, 'fetch_510880_qfq', lambda **kwargs: data)
     monkeypatch.setattr(export_mod, 'fetch_511260_qfq', lambda **kwargs: idle)
     monkeypatch.setattr(export_mod, 'fetch_sse_scale_history', lambda *args: scale)
-    payload = export_mod.export(tmp_path / 'open.json')
+    payload = export_mod.export(tmp_path / 'open.json', now=_fixture_now(data))
     assert payload['current_status']['holding']
     assert payload['trades'][-1]['open']
     assert payload['trades'][-1]['sell_close_price_raw'] == 90
@@ -118,5 +125,58 @@ def test_export_fails_on_missing_scale_instead_of_dropping_session(tmp_path, mon
     data, _, scale = _build_fixture()
     monkeypatch.setattr(export_mod, 'fetch_510880_qfq', lambda **kwargs: data)
     monkeypatch.setattr(export_mod, 'fetch_sse_scale_history', lambda *args: scale.iloc[:-1])
-    with pytest.raises(ValueError, match='份额规模数据缺失'):
-        export_mod.export(tmp_path / 'missing.json')
+    with pytest.raises(ValueError, match='份额规模.*stale'):
+        export_mod.export(tmp_path / 'missing.json', now=_fixture_now(data))
+
+
+@pytest.mark.parametrize('source', ['510880', '511260', 'scale'])
+@pytest.mark.parametrize('defect', ['stale', 'interior'])
+def test_export_gate_preserves_previous_output_on_incomplete_sources(tmp_path, monkeypatch, source, defect):
+    data, idle, scale = _build_fixture()
+    now = _fixture_now(data)
+    frames = {'510880': data, '511260': idle, 'scale': scale}
+    bad = frames[source]
+    frames[source] = bad.iloc[:-1] if defect == 'stale' else bad.drop(bad.index[350])
+    monkeypatch.setattr(export_mod, 'fetch_510880_qfq', lambda **kwargs: frames['510880'])
+    monkeypatch.setattr(export_mod, 'fetch_511260_qfq', lambda **kwargs: frames['511260'])
+    monkeypatch.setattr(export_mod, 'fetch_sse_scale_history', lambda *args: frames['scale'])
+    output = tmp_path / 'prior.json'
+    output.write_text('last known-good payload')
+    with pytest.raises(ValueError, match='stale|missing trading dates'):
+        export_mod.export(output, now=now)
+    assert output.read_text() == 'last known-good payload'
+
+
+def test_export_records_price_basis_provider_and_expected_session(tmp_path, monkeypatch):
+    data, idle, scale = _build_fixture()
+    monkeypatch.setattr(export_mod, 'fetch_510880_qfq', lambda **kwargs: data)
+    monkeypatch.setattr(export_mod, 'fetch_511260_qfq', lambda **kwargs: idle)
+    monkeypatch.setattr(export_mod, 'fetch_sse_scale_history', lambda *args: scale)
+    payload = export_mod.export(tmp_path / 'provenance.json', now=_fixture_now(data))
+    meta = payload['meta']
+    assert meta['expected_session'] == meta['as_of_date'] == data.index[-1].strftime('%Y-%m-%d')
+    assert meta['price_data']['510880']['provider'] == 'Fixture'
+    assert meta['price_data']['511260']['raw_price_basis'] == 'raw'
+
+
+def test_idle_unused_history_gap_does_not_block_consumed_window(tmp_path, monkeypatch):
+    data, idle, scale = _build_fixture()
+    idle = idle.drop(idle.index[100])  # Before the 272-session flow warmup ends.
+    monkeypatch.setattr(export_mod, 'fetch_510880_qfq', lambda **kwargs: data)
+    monkeypatch.setattr(export_mod, 'fetch_511260_qfq', lambda **kwargs: idle)
+    monkeypatch.setattr(export_mod, 'fetch_sse_scale_history', lambda *args: scale)
+    payload = export_mod.export(tmp_path / 'unused.json', now=_fixture_now(data))
+    assert payload['meta']['validation_windows']['511260_consumed_price'] == data.index[271].strftime('%Y-%m-%d')
+
+
+@pytest.mark.parametrize('missing_index', [271, 350, 409])
+def test_idle_consumed_first_interior_and_last_session_are_required(tmp_path, monkeypatch, missing_index):
+    data, idle, scale = _build_fixture()
+    idle = idle.drop(idle.index[missing_index])
+    monkeypatch.setattr(export_mod, 'fetch_510880_qfq', lambda **kwargs: data)
+    monkeypatch.setattr(export_mod, 'fetch_511260_qfq', lambda **kwargs: idle)
+    monkeypatch.setattr(export_mod, 'fetch_sse_scale_history', lambda *args: scale)
+    output = tmp_path / 'missing-required.json'
+    with pytest.raises(ValueError, match='511260: missing trading dates'):
+        export_mod.export(output, now=_fixture_now(data))
+    assert not output.exists()

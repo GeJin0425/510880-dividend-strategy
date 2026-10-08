@@ -1,7 +1,7 @@
 const FONT_SANS = '"Fira Sans","PingFang SC","Hiragino Sans GB","Microsoft YaHei",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif';
 const FONT_MONO = '"Fira Code","SFMono-Regular",Menlo,Consolas,monospace';
 const THEME_KEY = '510880-theme';
-const STALENESS_THRESHOLD_DAYS = 4;
+
 
 const state = {
   data: null,
@@ -27,7 +27,8 @@ async function main() {
     }
     state.data = data;
     renderAll(data);
-    checkStaleness(data.meta.as_of_date);
+    
+    checkStaleness(data.meta);
     initCollapsibleResize();
   } catch (err) {
     showLoadError(err);
@@ -210,19 +211,25 @@ function escapeHtml(value) {
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
   }[ch]));
 }
+function checkStaleness(meta) {
+  
+  const due = Date.parse(meta.stale_after);
+  
+  if (!Number.isFinite(due) || Date.now() < due) return;
+  
 
-function checkStaleness(asOfDate) {
-  const asOf = new Date(`${asOfDate}T00:00:00`);
-  if (isNaN(asOf.getTime())) return;
-  const now = new Date();
-  const diffDays = Math.floor((now.getTime() - asOf.getTime()) / (1000 * 60 * 60 * 24));
-  if (diffDays <= STALENESS_THRESHOLD_DAYS) return;
+  
+
+  
+
 
   const dot = document.getElementById('status-dot');
   dot.classList.add('stale');
-  dot.setAttribute('aria-label', `数据已 ${diffDays} 天未更新`);
+  
+  dot.setAttribute('aria-label', '最新交易日数据尚未发布');
   document.getElementById('updated-at').classList.add('stale');
-  showBanner(`数据已 ${diffDays} 天未更新,当前显示的可能不是最新信号(数据日期:${asOfDate})`);
+  
+  showBanner(`最新交易日数据尚未发布，计划更新可能延迟（当前数据日期：${meta.as_of_date}）`);
 }
 
 function renderAll(data) {

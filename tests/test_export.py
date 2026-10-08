@@ -180,3 +180,9 @@ def test_idle_consumed_first_interior_and_last_session_are_required(tmp_path, mo
     with pytest.raises(ValueError, match='511260: missing trading dates'):
         export_mod.export(output, now=_fixture_now(data))
     assert not output.exists()
+
+
+def test_freshness_deadline_skips_october_holiday():
+    assert export_mod._stale_after(pd.Timestamp('2026-09-30')) == '2026-10-09T00:30:00+08:00'
+    assert export_mod._stale_after(pd.Timestamp('2026-10-08')) == '2026-10-10T00:30:00+08:00'
+    assert export_mod._stale_after(pd.Timestamp('2026-12-31')) is None

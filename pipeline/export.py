@@ -8,7 +8,7 @@ import pandas as pd
 from .event_engine import simulate
 from .fetch import fetch_510880_qfq, fetch_511260_qfq
 from .indicators import add_indicators
-from .market_sessions import validate_sse_frame
+from .market_sessions import CALENDAR_END, SHANGHAI_TZ, sse_sessions, validate_sse_frame
 from .share_flow import (
     add_share_flow_indicators,
     derive_shares_from_scale,
@@ -24,6 +24,16 @@ EXECUTION_MODE = 'next_open'
 # 真实交易费率: 佣金万0.5(0.005%), 单笔最低0.5元, ETF免印花税
 FEE_RATE = 0.00005
 FEE_MIN = 0.5
+
+
+def _stale_after(session):
+    """Next completed exchange session’s planned publish time in Beijing."""
+    if session >= CALENDAR_END:
+        return None
+    later = sse_sessions(session + pd.Timedelta(days=1), CALENDAR_END)
+    if len(later) == 0:
+        return None
+    return (later[0] + pd.Timedelta(days=1, minutes=30)).tz_localize(SHANGHAI_TZ).isoformat()
 
 
 def _safe_list(series, ndigits=None):
@@ -299,7 +309,10 @@ def export(output_path, count_510880=3000, count_511260=2500, *, now=None):
             'flow_data_source': 'SSE scale / raw close',
             'updated_at': beijing_now.isoformat(),
             'as_of_date': df2.index[-1].strftime('%Y-%m-%d'),
+            
             'expected_session': expected_session.strftime('%Y-%m-%d'),
+            'stale_after': _stale_after(expected_session),
+
             'session_calendar': 'exchange_calendars XSHG; SSE-verified 2026',
             'price_data': {
                 '510880': dict(raw.attrs),
